@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Zuehke.Eacm.Web.Backend", "src\Zuehke.Eacm.Web.Backend\Zuehke.Eacm.Web.Backend.xproj", "{570EE828-5964-46FA-AA2D-BAD06C3F6224}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Zuehlke.Eacm.Web.Backend", "src\Zuehlke.Eacm.Web.Backend\Zuehlke.Eacm.Web.Backend.xproj", "{570EE828-5964-46FA-AA2D-BAD06C3F6224}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

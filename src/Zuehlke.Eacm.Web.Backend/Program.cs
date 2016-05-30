@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 
-namespace Zuehke.Eacm.Web.Backend
+namespace Zuehlke.Eacm.Web.Backend
 {
     public class Program
     {
