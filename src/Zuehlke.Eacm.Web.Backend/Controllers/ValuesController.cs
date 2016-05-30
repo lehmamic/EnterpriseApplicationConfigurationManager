@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Zuehke.Eacm.Web.Backend.Controllers
+namespace Zuehlke.Eacm.Web.Backend.Controllers
 {
     [Route("api/[controller]")]
     public class ValuesController : Controller
