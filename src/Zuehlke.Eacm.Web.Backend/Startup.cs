@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Zuehlke.Eacm.Web.Backend.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace Zuehlke.Eacm.Web.Backend
 {
@@ -28,6 +30,8 @@ namespace Zuehlke.Eacm.Web.Backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<EacmDbContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")));
+
             // Add framework services.
             services.AddMvc();
         }
