@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 
 namespace Zuehlke.Eacm.Web.Backend.DomainModel
 {
@@ -10,6 +12,11 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         private string description;
 
         private Dictionary<EntityDefinition, ConfigurationEntity> configurations = new Dictionary<EntityDefinition, ConfigurationEntity>();
+
+        public Project(IEnumerable<IVersionedEvent> history)
+        {
+            
+        }
 
         #region Implementation of IAggregateRoot
         public Guid Id { get; }
