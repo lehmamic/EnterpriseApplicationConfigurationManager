@@ -1,15 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Zuehlke.Eacm.Web.Backend.DomainModel
 {
-    public class Project
+    public class Project : IAggregateRoot
     {
+        private string name;
+
+        private string description;
+
+        private Dictionary<EntityDefinition, ConfigurationEntity> configurations = new Dictionary<EntityDefinition, ConfigurationEntity>();
+
+        #region Implementation of IAggregateRoot
+        public Guid Id { get; }
+        #endregion
+
         public ModelDefinition Definition { get; } = new ModelDefinition();
-
-
     }
 
     public class ModelDefinition
@@ -21,6 +27,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
     {
         private readonly List<PropertyDefinition> entities = new List<PropertyDefinition>();
 
+        private Guid id;
         private string name;
     }
 
@@ -41,15 +48,6 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
     public class ConfigurationEntry
     {
-        
-    }
-
-    public class ConfigurationValue
-    {
-        public Guid Id { get; set; }
-
-        public PropertyDefinition Property { get; set; }
-
-        public string Value { get; set; }
+        private Dictionary<PropertyDefinition, string> values = new Dictionary<PropertyDefinition, string>();
     }
 }
