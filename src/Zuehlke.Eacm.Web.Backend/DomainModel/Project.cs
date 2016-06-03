@@ -13,7 +13,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
         private Dictionary<EntityDefinition, ConfigurationEntity> configurations = new Dictionary<EntityDefinition, ConfigurationEntity>();
 
-        public Project(IEnumerable<IVersionedEvent> history)
+        public Project(IEnumerable<IEvent> history)
         {
             
         }
