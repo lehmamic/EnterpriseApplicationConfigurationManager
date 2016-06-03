@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Zuehlke.Eacm.Web.Backend.DomainModel.Events
 {
-    public interface IVersionedEvent
+    public interface IEvent
     {
         Guid Id { get; }
-        
+
+        Guid SourceId { get; set; }
+
         DateTime Timestamp { get; set; }
         
         Guid CorrelationId { get; set; }
