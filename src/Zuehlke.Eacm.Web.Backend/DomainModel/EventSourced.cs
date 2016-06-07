@@ -10,11 +10,10 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 {
     public abstract class EventSourced : IEventSourced
     {
+        private static readonly DateTime InitialCreatedValue = DateTime.MinValue;
+
         private readonly Dictionary<Type, Action<IEvent>> handlers = new Dictionary<Type, Action<IEvent>>();
         private readonly Collection<IEvent> pendingEvents = new Collection<IEvent>();
-
-        private DateTime created;
-        private DateTime modified;
 
         protected EventSourced(Guid id)
         {
@@ -26,13 +25,12 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         #endregion
 
         #region Implementation of IEventSourced
-        public DateTime Created => this.created;
+        public DateTime Created { get; private set; } = InitialCreatedValue;
 
-        public DateTime Modified => this.modified;
+        public DateTime? Modified { get; private set; }
 
         public IEnumerable<IEvent> PendingEvents => this.pendingEvents.ToImmutableArray();
         #endregion
-
 
         protected void Handles<TEvent>(Action<TEvent> handler)
             where TEvent : IEvent
@@ -65,7 +63,20 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         private void HandleEvent(IEvent e)
         {
             this.handlers[e.GetType()].Invoke(e);
-            this.modified = e.Timestamp;
+
+            if (this.IsNew())
+            {
+                this.Created = e.Timestamp;
+            }
+            else
+            {
+                this.Modified = e.Timestamp;
+            }
+        }
+
+        private bool IsNew()
+        {
+            return this.Created == InitialCreatedValue;
         }
     }
 }
