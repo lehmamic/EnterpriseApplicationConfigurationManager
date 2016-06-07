@@ -1,28 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 
 namespace Zuehlke.Eacm.Web.Backend.DomainModel
 {
-    public class Project : IAggregateRoot
+    public class Project : EventSourced
     {
-        private string name;
-
-        private string description;
-
         private Dictionary<EntityDefinition, ConfigurationEntity> configurations = new Dictionary<EntityDefinition, ConfigurationEntity>();
 
-        public Project(IEnumerable<IEvent> history)
+        protected Project(Guid id)
+            : base(id)
         {
-            
+            base.Handles<ProjectAttributesChanged>(this.OnProjectAttributesChanged);
+        }
+
+        public Project(Guid id, IEnumerable<IEvent> history)
+            : this(id)
+        {
+            history.ArgumentNotNull(nameof(history));
+
+            this.LoadFrom(history);
         }
 
         #region Implementation of IAggregateRoot
         public Guid Id { get; }
         #endregion
 
+        public string Name { get; private set; }
+
+        public string Description { get; private set; }
+
         public ModelDefinition Definition { get; } = new ModelDefinition();
+
+        private void OnProjectAttributesChanged(ProjectAttributesChanged e)
+        {
+            if (e.Name != null)
+            {
+                this.Name = e.Name;
+            }
+
+            if (e.Description != null)
+            {
+                this.Description = e.Description;
+            }
+        }
     }
 
     public class ModelDefinition
