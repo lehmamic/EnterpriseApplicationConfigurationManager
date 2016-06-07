@@ -8,7 +8,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
     {
         DateTime Created { get; }
 
-        DateTime Modified { get; }
+        DateTime? Modified { get; }
 
         IEnumerable<IEvent> PendingEvents { get; }
     }
