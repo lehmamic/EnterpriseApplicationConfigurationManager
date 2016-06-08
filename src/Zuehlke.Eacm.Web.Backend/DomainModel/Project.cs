@@ -34,6 +34,20 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
         public ModelDefinition Definition { get; } = new ModelDefinition();
 
+        public void SetProjectAttributes(string name, string description)
+        {
+            name.ArgumentNotEmpty(nameof(name));
+            description.ArgumentNotEmpty(nameof(description));
+
+            var e = new ProjectAttributesChanged
+            {
+                Name = name,
+                Description = description,
+            };
+
+            this.Update(e);
+        }
+
         private void OnProjectAttributesChanged(ProjectAttributesChanged e)
         {
             if (e.Name != null)
