@@ -13,5 +13,15 @@ namespace Zuehlke.Eacm.Web.Backend.Diagnostics
 
             return source;
         }
+
+        public static string ArgumentNotEmpty(this string source, string parameterName)
+        {
+            if (source!= null && source.Trim() == string.Empty)
+            {
+                throw new ArgumentException($"The parameter {parameterName} should not be empty.", parameterName);
+            }
+
+            return source;
+        }
     }
 }
