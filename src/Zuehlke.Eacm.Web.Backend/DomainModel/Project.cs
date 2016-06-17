@@ -24,10 +24,6 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             this.LoadFrom(history);
         }
 
-        #region Implementation of IAggregateRoot
-        public Guid Id { get; }
-        #endregion
-
         public string Name { get; private set; }
 
         public string Description { get; private set; }
