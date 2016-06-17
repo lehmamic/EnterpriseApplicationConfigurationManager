@@ -96,11 +96,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             var target = new Project(id, history);
 
             // act
-            target.SetProjectAttributes(name, description);
-
-            // assert
-            Assert.Equal(name, target.Name);
-            Assert.Equal(description, target.Description);
+            Assert.ThrowsAny<ArgumentException>(() => target.SetProjectAttributes(name, description));
         }
     }
 }
