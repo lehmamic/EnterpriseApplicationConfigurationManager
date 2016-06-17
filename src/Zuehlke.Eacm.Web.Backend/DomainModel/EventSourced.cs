@@ -52,11 +52,12 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
         protected void Update(IEvent e)
         {
+            e.ArgumentNotNull(nameof(e));
+
             e.SourceId = this.Id;
             e.Timestamp = DateTime.UtcNow;
 
             this.HandleEvent(e);
-
             this.pendingEvents.Add(e);
         }
 

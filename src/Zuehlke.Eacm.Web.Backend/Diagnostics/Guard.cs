@@ -14,11 +14,11 @@ namespace Zuehlke.Eacm.Web.Backend.Diagnostics
             return source;
         }
 
-        public static string ArgumentNotEmpty(this string source, string parameterName)
+        public static string ArgumentNotNullOrEmpty(this string source, string parameterName)
         {
-            if (source!= null && source.Trim() == string.Empty)
+            if (string.IsNullOrWhiteSpace(source))
             {
-                throw new ArgumentException($"The parameter {parameterName} should not be empty.", parameterName);
+                throw new ArgumentException($"The parameter {parameterName} should not be null or empty.", parameterName);
             }
 
             return source;
