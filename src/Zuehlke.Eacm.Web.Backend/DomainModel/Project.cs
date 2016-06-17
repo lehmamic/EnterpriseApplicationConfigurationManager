@@ -36,8 +36,8 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
         public void SetProjectAttributes(string name, string description)
         {
-            name.ArgumentNotEmpty(nameof(name));
-            description.ArgumentNotEmpty(nameof(description));
+            name.ArgumentNotNullOrEmpty(nameof(name));
+            description.ArgumentNotNull(nameof(description));
 
             var e = new ProjectAttributesChanged
             {
@@ -50,15 +50,8 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
         private void OnProjectAttributesChanged(ProjectAttributesChanged e)
         {
-            if (e.Name != null)
-            {
                 this.Name = e.Name;
-            }
-
-            if (e.Description != null)
-            {
                 this.Description = e.Description;
-            }
         }
     }
 
