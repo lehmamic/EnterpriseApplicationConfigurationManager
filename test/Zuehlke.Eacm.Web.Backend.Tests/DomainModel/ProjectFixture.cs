@@ -64,6 +64,76 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             Assert.Null(target.Description);
         }
 
+        [Fact]
+        public void Constructor_WithHistory_AppliesTheEvents()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>
+            {
+                new ProjectAttributesChanged { SourceId = id, CorrelationId = Guid.NewGuid(), Id = Guid.NewGuid(), Name = "AnyName", Description = "AnyDescription" },
+            };
+
+            // act
+            var target = new Project(id, history);
+
+            // assert
+            Assert.Equal("AnyName", target.Name);
+            Assert.Equal("AnyDescription", target.Description);
+        }
+
+        [Fact]
+        public void Constructor_WithHistory_AppliesTheEventsInCorrectOrder()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>
+            {
+                new ProjectAttributesChanged { SourceId = id, CorrelationId = Guid.NewGuid(), Id = Guid.NewGuid(), Name = "FirstName", Description = "FirstDescription" },
+                new ProjectAttributesChanged { SourceId = id, CorrelationId = Guid.NewGuid(), Id = Guid.NewGuid(), Name = "SecondName", Description = "SecondDescription" },
+            };
+
+            // act
+            var target = new Project(id, history);
+
+            // assert
+            Assert.Equal("SecondName", target.Name);
+            Assert.Equal("SecondDescription", target.Description);
+        }
+
+        [Fact]
+        public void Constructor_WithHistoryEventIdsNotMatchingWithModelId_ThrowsException()
+        {
+            // arrange
+            var modelId = Guid.NewGuid();
+            var eventsId = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>
+            {
+                new ProjectAttributesChanged { SourceId = eventsId, CorrelationId = Guid.NewGuid(), Id = Guid.NewGuid(), Name = "AnyName", Description = "AnyDescription" },
+                new ProjectAttributesChanged { SourceId = eventsId, CorrelationId = Guid.NewGuid(), Id = Guid.NewGuid(), Name = "AnyName", Description = "AnyDescription" },
+                new ProjectAttributesChanged { SourceId = eventsId, CorrelationId = Guid.NewGuid(), Id = Guid.NewGuid(), Name = "AnyName", Description = "AnyDescription" },
+            };
+
+            // act
+            Assert.ThrowsAny<ArgumentException>(() => new Project(modelId, history));
+        }
+
+        [Fact]
+        public void Constructor_WithHistoryEventIdsNotEqualWithModelId_ThrowsException()
+        {
+            // arrange
+            var modelId = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>
+            {
+                new ProjectAttributesChanged { SourceId = modelId, CorrelationId = Guid.NewGuid(), Id = Guid.NewGuid(), Name = "AnyName", Description = "AnyDescription" },
+                new ProjectAttributesChanged { SourceId = Guid.NewGuid(), CorrelationId = Guid.NewGuid(), Id = Guid.NewGuid(), Name = "AnyName", Description = "AnyDescription" },
+                new ProjectAttributesChanged { SourceId = modelId, CorrelationId = Guid.NewGuid(), Id = Guid.NewGuid(), Name = "AnyName", Description = "AnyDescription" },
+            };
+
+            // act
+            Assert.ThrowsAny<ArgumentException>(() => new Project(modelId, history));
+        }
+
         [Theory]
         [InlineData("any name", "any description")]
         [InlineData("any name", "")]
