@@ -51,7 +51,7 @@ namespace Zuehlke.Eacm.Web.Backend.Diagnostics
         }
 
 
-        public static T InvalidCondition<T>(this T source, Predicate<T> expectedCondition, string message, string parameterName)
+        public static T ExpectedCondition<T>(this T source, Predicate<T> expectedCondition, string message, string parameterName)
         {
             source.ArgumentNotNull(parameterName);
 
