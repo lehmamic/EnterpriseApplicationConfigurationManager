@@ -19,7 +19,9 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         public Project(Guid id, IEnumerable<IEvent> history)
             : this(id)
         {
-            history.ArgumentNotNull(nameof(history));
+            history.ArgumentNotNull(nameof(history))
+                .ItemsNotNull(nameof(history))
+                .ExpectedCondition(i => i.All(e => e.SourceId == id), "The history contains events from another source object.", nameof(history));
 
             this.LoadFrom(history);
         }
