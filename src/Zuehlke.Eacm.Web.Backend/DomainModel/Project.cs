@@ -1,30 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using Zuehlke.Eacm.Web.Backend.CQRS;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
+using Zuehlke.Eacm.Web.Backend.DomainModel.Commands;
 using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 
 namespace Zuehlke.Eacm.Web.Backend.DomainModel
 {
-    public class Project : EventSourced
+    public class Project : AggregateRoot,
+        ICommandHandler<ChangeProjectAttributes>,
+        IEventHandler<ProjectAttributesChanged>
     {
         private Dictionary<EntityDefinition, ConfigurationEntity> configurations = new Dictionary<EntityDefinition, ConfigurationEntity>();
-
-        protected Project(Guid id)
-            : base(id)
-        {
-            base.Handles<ProjectAttributesChanged>(this.OnProjectAttributesChanged);
-        }
-
-        public Project(Guid id, IEnumerable<IEvent> history)
-            : this(id)
-        {
-            history.ArgumentNotNull(nameof(history))
-                .ItemsNotNull(nameof(history))
-                .ExpectedCondition(i => i.All(e => e.SourceId == id), "The history contains events from another source object.", nameof(history));
-
-            this.LoadFrom(history);
-        }
 
         public string Name { get; private set; }
 
@@ -32,24 +19,32 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
         public ModelDefinition Definition { get; } = new ModelDefinition();
 
-        public void SetProjectAttributes(string name, string description)
+
+        public IEnumerable<IEvent> Handle(ChangeProjectAttributes command)
         {
-            name.ArgumentNotNullOrEmpty(nameof(name));
-            description.ArgumentNotNull(nameof(description));
+            @command.ArgumentNotNull(nameof(command));
 
             var e = new ProjectAttributesChanged
             {
-                Name = name,
-                Description = description,
+                Id = Guid.NewGuid(),
+                SourceId = this.Id,
+                Name = command.Name,
+                Description = command.Description,
             };
 
             this.Update(e);
+
+        	yield return e;
         }
 
-        private void OnProjectAttributesChanged(ProjectAttributesChanged e)
+        public void Handle(ProjectAttributesChanged @event)
         {
-                this.Name = e.Name;
-                this.Description = e.Description;
+            @event.ArgumentNotNull(nameof(@event));
+
+            this.Modified = @event.Timestamp;
+
+         	this.Name = @event.Name;
+        	this.Description = @event.Description;
         }
     }
 
