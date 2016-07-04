@@ -1,4 +1,4 @@
-namespace Zuehlke.Eacm.Web.Backend.DomainModel.Events
+namespace Zuehlke.Eacm.Web.Backend.CQRS
 {
     public interface IEventHandler<T> where T : IEvent
     {

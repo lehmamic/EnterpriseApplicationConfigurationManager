@@ -4,9 +4,8 @@ using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
-using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 
-namespace Zuehlke.Eacm.Web.Backend.DomainModel
+namespace Zuehlke.Eacm.Web.Backend.CQRS
 {
     public abstract class EventSourced : IEventSourced
     {

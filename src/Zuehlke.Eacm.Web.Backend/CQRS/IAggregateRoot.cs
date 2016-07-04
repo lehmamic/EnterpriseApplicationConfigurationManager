@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Zuehlke.Eacm.Web.Backend.DomainModel
+namespace Zuehlke.Eacm.Web.Backend.CQRS
 {
     public interface IAggregateRoot
     {

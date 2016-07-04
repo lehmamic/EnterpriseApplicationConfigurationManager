@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 
-namespace Zuehlke.Eacm.Web.Backend.DomainModel
+namespace Zuehlke.Eacm.Web.Backend.CQRS
 {
     public interface IEventSourced : IAggregateRoot
     {

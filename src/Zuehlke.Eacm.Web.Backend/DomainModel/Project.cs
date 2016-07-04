@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Zuehlke.Eacm.Web.Backend.CQRS;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Xunit;
+using Zuehlke.Eacm.Web.Backend.CQRS;
 using Zuehlke.Eacm.Web.Backend.DomainModel;
 using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 
