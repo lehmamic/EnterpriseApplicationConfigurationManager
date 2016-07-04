@@ -1,4 +1,5 @@
 ﻿using System;
+using Zuehlke.Eacm.Web.Backend.CQRS;
 
 namespace Zuehlke.Eacm.Web.Backend.DomainModel.Events
 {
