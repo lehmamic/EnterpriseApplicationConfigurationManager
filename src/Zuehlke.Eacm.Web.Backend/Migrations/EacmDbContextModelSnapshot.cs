@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
 
 namespace Zuehlke.Eacm.Web.Backend.Migrations
