@@ -15,6 +15,8 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             : base(id)
         {
             base.Handles<ProjectAttributesChanged>(this.OnProjectAttributesChanged);
+            base.Handles<EntityDefinitionAdded>(this.OnEntityDefinitionAdded);
+            base.Handles<EntityDefinitionModified>(this.OnEntityDefinitionModified);
         }
 
         public Project(Guid id, IEnumerable<IEvent> history)
@@ -31,7 +33,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
         public string Description { get; private set; }
 
-        public ModelDefinition Definition { get; } = new ModelDefinition();
+        public ModelDefinition Schema { get; } = new ModelDefinition();
 
         public void SetProjectAttributes(string name, string description)
         {
@@ -47,16 +49,64 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             this.Update(e);
         }
 
+        public void AddEntityDefinition(string name, string description)
+        {
+            name.ArgumentNotNullOrEmpty(nameof(name));
+            description.ArgumentNotNull(nameof(description));
+
+            var e = new EntityDefinitionAdded
+            {
+                EntityId = Guid.NewGuid(),
+                Name = name,
+                Description = description,
+            };
+
+            this.Update(e);
+        }
+
+        public void ModifyEntityDefinition(Guid entityId, string name, string description)
+        {
+            name.ArgumentNotNullOrEmpty(nameof(name));
+            description.ArgumentNotNull(nameof(description));
+
+            var entity = this.Schema.Entities.SingleOrDefault(i => i.Id == entityId);
+            if(entity == null)
+            {
+                throw new ArgumentException($"No entity definition with id {entityId} was found.", nameof(entityId));
+            }
+
+            var e = new EntityDefinitionModified
+            {
+                EntityId = entity.Id,
+                Name = name,
+                Description = description,
+            };
+
+            this.Update(e);
+        }
+
         private void OnProjectAttributesChanged(ProjectAttributesChanged e)
         {
-                this.Name = e.Name;
-                this.Description = e.Description;
+            this.Name = e.Name;
+            this.Description = e.Description;
+        }
+
+        private void OnEntityDefinitionAdded(EntityDefinitionAdded e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OnEntityDefinitionModified(EntityDefinitionModified e)
+        {
+            throw new NotImplementedException();
         }
     }
 
     public class ModelDefinition
     {
         private readonly List<EntityDefinition> entities = new List<EntityDefinition>();
+
+        public IEnumerable<EntityDefinition> Entities => this.entities;
     }
 
     public class EntityDefinition
@@ -65,6 +115,8 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
         private Guid id;
         private string name;
+
+        public Guid Id => this.id;
     }
 
     public class PropertyDefinition
