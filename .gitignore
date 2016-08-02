@@ -29,6 +29,11 @@ wwwroot/
 #Visul Studio Code options directory
 .vscode/
 
+#rider options directory
+.idea/
+.idea.*
+
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
