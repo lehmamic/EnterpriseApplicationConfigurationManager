@@ -29,7 +29,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.Utils.PubSubEvents
             var actual = token1.Equals(token2);
 
             // assert
-            Assert.True(actual);
+            Assert.False(actual);
         }
 
         public void Dispose_UnsubscriptionActionIsNotNull_ExecutesUnsubscriptionAction()
