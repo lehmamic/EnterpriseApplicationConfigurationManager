@@ -13,6 +13,9 @@ namespace Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents
 
         public SubscriptionToken Subscribe<TEvent>(Action<TEvent> action, Predicate<TEvent> filter)
         {
+            action.ArgumentNotNull(nameof(action));
+            filter.ArgumentNotNull(nameof(filter));
+
             Type eventType = typeof(TEvent);
             if(!this.eventSubscriptions.ContainsKey(eventType))
             {
@@ -20,10 +23,11 @@ namespace Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents
             }
 
             ICollection<IEventSubscription> subscriptions = this.eventSubscriptions[eventType];
-
             
             var eventSubscription = new EventSubscription<TEvent>(action, filter);
             eventSubscription.SubscriptionToken = new SubscriptionToken(t => subscriptions.Remove(eventSubscription));
+
+            subscriptions.Add(eventSubscription);
 
             return eventSubscription.SubscriptionToken;
         }
@@ -34,11 +38,11 @@ namespace Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents
 
             var subscription = this.eventSubscriptions.Values
                 .SelectMany(c => c)
-                .FirstOrDefault(s => s.SubscriptionToken ==  token) as IDisposable;
+                .FirstOrDefault(s => s.SubscriptionToken.Equals(token));
             
             if(subscription != null)
             {
-                subscription.Dispose();
+                subscription.SubscriptionToken.Dispose();
             }
         }
 
