@@ -1,5 +1,4 @@
 using System;
-using Zuehlke.Eacm.Web.Backend.Diagnostics;
 
 namespace Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents
 {
