@@ -93,13 +93,49 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.Utils.PubSubEvents
         [Fact]
         public void Publish_WithOtherEvent_WillNotExecuteAction()
         {
-            // todo
+            // arrange
+            bool executed = false;
+
+            Action<int> action = o => executed = true;
+            Predicate<int> filter = o => true;
+
+            IEventAggregator target = new EventAggregator();
+            SubscriptionToken token = target.Subscribe(action, filter);
+            target.Unsubscribe(token);
+
+            // act
+            target.Publish(string.Empty);
+
+            // assert
+            Assert.False(executed);
         }
 
         [Fact]
         public void Publish_WithSubscribedToParentObject_WillExecuteAction()
         {
-            // todo
+            // arrange
+            bool executed = false;
+
+            Action<ITestEvent> action = o => executed = true;
+            Predicate<ITestEvent> filter = o => true;
+
+            IEventAggregator target = new EventAggregator();
+            SubscriptionToken token = target.Subscribe(action, filter);
+            target.Unsubscribe(token);
+
+            // act
+            target.Publish(new TestEvent());
+
+            // assert
+            Assert.True(executed);
+        }
+
+        private interface ITestEvent
+        {
+        }
+
+        private class TestEvent : ITestEvent
+        {
         }
     }
 }
