@@ -101,7 +101,6 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.Utils.PubSubEvents
 
             IEventAggregator target = new EventAggregator();
             SubscriptionToken token = target.Subscribe(action, filter);
-            target.Unsubscribe(token);
 
             // act
             target.Publish(string.Empty);
@@ -121,7 +120,6 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.Utils.PubSubEvents
 
             IEventAggregator target = new EventAggregator();
             SubscriptionToken token = target.Subscribe(action, filter);
-            target.Unsubscribe(token);
 
             // act
             target.Publish(new TestEvent());
