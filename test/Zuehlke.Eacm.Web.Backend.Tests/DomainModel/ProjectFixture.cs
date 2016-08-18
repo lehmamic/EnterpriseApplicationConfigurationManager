@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 using Zuehlke.Eacm.Web.Backend.CQRS;
 using Zuehlke.Eacm.Web.Backend.DomainModel;
@@ -168,6 +169,42 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
 
             // act
             Assert.ThrowsAny<ArgumentException>(() => target.SetProjectAttributes(name, description));
+        }
+
+        [Theory]
+        [InlineData("any name", "any description")]
+        [InlineData("any name", "")]
+        public void AddEntityDefinition_WithValidParameters_AddsModelNode(string name, string description)
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+
+            // act
+            target.AddEntityDefinition(name, description);
+
+            // assert
+            Assert.Equal(target.Schema.Entities.Count(), 1);
+            Assert.Equal(name, target.Schema.Entities.ElementAt(0).Name);
+            Assert.Equal(description, target.Schema.Entities.ElementAt(0).Description);
+        }
+
+        [Theory]
+        [InlineData(null, "any description")]
+        [InlineData("", "any description")]
+        [InlineData("any name", null)]
+        public void AddEntityDefinition_WithInvalidParameters_ThrowsException(string name, string description)
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+
+            // act
+            Assert.ThrowsAny<ArgumentException>(() => target.AddEntityDefinition(name, description));
         }
     }
 }
