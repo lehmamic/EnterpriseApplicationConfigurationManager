@@ -4,19 +4,20 @@ using System.Linq;
 using Zuehlke.Eacm.Web.Backend.CQRS;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
+using Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents;
 
 namespace Zuehlke.Eacm.Web.Backend.DomainModel
 {
     public class Project : EventSourced
     {
-        private Dictionary<EntityDefinition, ConfigurationEntity> configurations = new Dictionary<EntityDefinition, ConfigurationEntity>();
+        private readonly Dictionary<EntityDefinition, ConfigurationEntity> configurations = new Dictionary<EntityDefinition, ConfigurationEntity>();
 
         protected Project(Guid id)
             : base(id)
         {
-            base.Handles<ProjectAttributesChanged>(this.OnProjectAttributesChanged);
-            base.Handles<EntityDefinitionAdded>(this.OnEntityDefinitionAdded);
-            base.Handles<EntityDefinitionModified>(this.OnEntityDefinitionModified);
+            this.EventAggregator.Subscribe<ProjectAttributesChanged>(this.OnProjectAttributesChanged);
+            this.EventAggregator.Subscribe<EntityDefinitionAdded>(this.OnEntityDefinitionAdded);
+            this.EventAggregator.Subscribe<EntityDefinitionModified>(this.OnEntityDefinitionModified);
         }
 
         public Project(Guid id, IEnumerable<IEvent> history)
