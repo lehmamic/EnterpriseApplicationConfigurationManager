@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
+using Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents;
 
 namespace Zuehlke.Eacm.Web.Backend.CQRS
 {
@@ -28,16 +29,10 @@ namespace Zuehlke.Eacm.Web.Backend.CQRS
 
         public DateTime? Modified { get; private set; }
 
+        public IEventAggregator EventAggregator { get; } = new EventAggregator();
+
         public IEnumerable<IEvent> PendingEvents => this.pendingEvents.ToImmutableArray();
         #endregion
-
-        protected void Handles<TEvent>(Action<TEvent> handler)
-            where TEvent : IEvent
-        {
-            handler.ArgumentNotNull(nameof(handler));
-
-            this.handlers.Add(typeof(TEvent), @event => handler((TEvent)@event));
-        }
 
         protected void LoadFrom(IEnumerable<IEvent> pastEvents)
         {
@@ -62,7 +57,7 @@ namespace Zuehlke.Eacm.Web.Backend.CQRS
 
         private void HandleEvent(IEvent e)
         {
-            this.handlers[e.GetType()].Invoke(e);
+            this.EventAggregator.PublishEvent(e);
 
             if (this.IsNew())
             {
