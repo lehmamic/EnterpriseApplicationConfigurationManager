@@ -48,10 +48,10 @@ namespace Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents
 
         public void Publish<TEvent>(TEvent payload)
         {
-            var targetEventTypes = this.eventSubscriptions.Keys
+            var targetEventTypes = this.eventSubscriptions.Keys.ToArray()
                 .Where(t => t.IsAssignableFrom(typeof(TEvent)));
 
-            foreach(var subscription in targetEventTypes.SelectMany(t => this.eventSubscriptions[t]))
+            foreach(var subscription in targetEventTypes.SelectMany(t => this.eventSubscriptions[t]).ToArray())
             {
                 Action<object> executionStrategy = subscription.GetExecutionStrategy();
                 executionStrategy(payload);

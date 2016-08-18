@@ -16,8 +16,6 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             : base(id)
         {
             this.EventAggregator.Subscribe<ProjectAttributesChanged>(this.OnProjectAttributesChanged);
-            this.EventAggregator.Subscribe<EntityDefinitionAdded>(this.OnEntityDefinitionAdded);
-            this.EventAggregator.Subscribe<EntityDefinitionModified>(this.OnEntityDefinitionModified);
         }
 
         public Project(Guid id, IEnumerable<IEvent> history)
@@ -27,6 +25,8 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
                 .ItemsNotNull(nameof(history))
                 .ExpectedCondition(i => i.All(e => e.SourceId == id), "The history contains events from another source object.", nameof(history));
 
+            this.Schema = new ModelDefinition(this.EventAggregator);    
+
             this.LoadFrom(history);
         }
 
@@ -34,7 +34,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
         public string Description { get; private set; }
 
-        public ModelDefinition Schema { get; } = new ModelDefinition();
+        public ModelDefinition Schema { get; }
 
         public void SetProjectAttributes(string name, string description)
         {
@@ -91,34 +91,11 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             this.Name = e.Name;
             this.Description = e.Description;
         }
-
-        private void OnEntityDefinitionAdded(EntityDefinitionAdded e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void OnEntityDefinitionModified(EntityDefinitionModified e)
-        {
-            throw new NotImplementedException();
-        }
     }
 
-    public class ModelDefinition
-    {
-        private readonly List<EntityDefinition> entities = new List<EntityDefinition>();
 
-        public IEnumerable<EntityDefinition> Entities => this.entities;
-    }
 
-    public class EntityDefinition
-    {
-        private readonly List<PropertyDefinition> entities = new List<PropertyDefinition>();
-
-        private Guid id;
-        private string name;
-
-        public Guid Id => this.id;
-    }
+    
 
     public class PropertyDefinition
     {
