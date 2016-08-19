@@ -206,5 +206,56 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             // act
             Assert.ThrowsAny<ArgumentException>(() => target.AddEntityDefinition(name, description));
         }
+
+        [Theory]
+        [InlineData("any name", "any description")]
+        [InlineData("any name", "")]
+        public void ModifEntityDefinition_WithValidParameters_AddsModelNode(string name, string description)
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+            target.AddEntityDefinition("initial name", "initial description");
+
+            Guid entityId = target.Schema.Entities.ElementAt(0).Id;
+
+            // act
+            target.ModifyEntityDefinition(entityId, name, description);
+
+            // assert
+            Assert.Equal(name, target.Schema.Entities.ElementAt(0).Name);
+            Assert.Equal(description, target.Schema.Entities.ElementAt(0).Description);
+        }
+
+        [Theory]
+        [InlineData(null, "any description")]
+        [InlineData("", "any description")]
+        [InlineData("any name", null)]
+        public void ModifyEntityDefinition_WithInvalidParameters_ThrowsException(string name, string description)
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+
+            // act
+            Assert.ThrowsAny<ArgumentException>(() => target.ModifyEntityDefinition(Guid.NewGuid(), name, description));
+        }
+
+        [Fact]
+        public void ModifEntityDefinition_WithNotExistingEntityId_ThrowsException()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+
+            // act
+            Assert.ThrowsAny<ArgumentException>(() => target.ModifyEntityDefinition(Guid.NewGuid(), "name", "description"));
+        }
     }
 }
