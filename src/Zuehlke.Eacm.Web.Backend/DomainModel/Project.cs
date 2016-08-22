@@ -86,6 +86,16 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             this.Update(e);
         }
 
+        public void DeleteEntityDefinition(Guid entityId)
+        {
+            var e = new EntityDefinitionDeleted
+            {
+                EntityId = entityId
+            };
+
+            this.Update(e);
+        }
+
         private void OnProjectAttributesChanged(ProjectAttributesChanged e)
         {
             this.Name = e.Name;
