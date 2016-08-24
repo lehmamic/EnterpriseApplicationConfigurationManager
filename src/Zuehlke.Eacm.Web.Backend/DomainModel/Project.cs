@@ -96,6 +96,24 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             this.Update(e);
         }
 
+        public void AddPropertyDefinition(Guid entityId, string name, string description, string propertyType)
+        {
+            name.ArgumentNotNullOrEmpty(nameof(name));
+            description.ArgumentNotNull(nameof(description));
+            propertyType.ArgumentNotNullOrEmpty(nameof(propertyType));
+
+            var e = new PropertyDefinitionAdded
+            {
+                EntityId = entityId,
+                PropertyId = Guid.NewGuid(),
+                Name = name,
+                Description = description,
+                PropertyType = propertyType
+            };
+
+            this.Update(e);
+        }
+
         private void OnProjectAttributesChanged(ProjectAttributesChanged e)
         {
             this.Name = e.Name;
@@ -107,16 +125,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
     
 
-    public class PropertyDefinition
-    {
-        public Guid Id { get; set; }
 
-        public string Name { get; set; }
-
-        public string PropertyType { get; set; }
-
-        public EntityDefinition Reference { get; set; }
-    }
 
     public class ConfigurationEntity
     {
