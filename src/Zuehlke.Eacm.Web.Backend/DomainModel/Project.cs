@@ -70,11 +70,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             name.ArgumentNotNullOrEmpty(nameof(name));
             description.ArgumentNotNull(nameof(description));
 
-            var entity = this.Schema.Entities.SingleOrDefault(i => i.Id == entityId);
-            if(entity == null)
-            {
-                throw new ArgumentException($"No entity definition with id {entityId} was found.", nameof(entityId));
-            }
+            var entity = this.GetEntityDefinition(entityId);
 
             var e = new EntityDefinitionModified
             {
@@ -102,9 +98,12 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             description.ArgumentNotNull(nameof(description));
             propertyType.ArgumentNotNullOrEmpty(nameof(propertyType));
 
+            // the entity gets fetched to assert its existence.
+            var entity = this.GetEntityDefinition(entityId);
+
             var e = new PropertyDefinitionAdded
             {
-                EntityId = entityId,
+                EntityId = entity.Id,
                 PropertyId = Guid.NewGuid(),
                 Name = name,
                 Description = description,
@@ -112,6 +111,17 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             };
 
             this.Update(e);
+        }
+
+        private EntityDefinition GetEntityDefinition(Guid entityId)
+        {
+            var entity = this.Schema.Entities.SingleOrDefault(i => i.Id == entityId);
+            if(entity == null)
+            {
+                throw new ArgumentException($"No entity definition with id {entityId} was found.", nameof(entityId));
+            }
+
+            return entity;
         }
 
         private void OnProjectAttributesChanged(ProjectAttributesChanged e)

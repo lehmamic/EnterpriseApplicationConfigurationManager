@@ -333,5 +333,18 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             var entity = target.Schema.Entities.First(); 
             Assert.ThrowsAny<ArgumentException>(() => target.AddPropertyDefinition(entity.Id, name, description, propertyType));
         }
+
+        [Fact]
+        public void AddPropertyDefinition_WithNotExistingEntityId_ThrowsException()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);          
+
+            // act
+            Assert.ThrowsAny<ArgumentException>(() => target.AddPropertyDefinition(Guid.NewGuid(), "any name", "any description", "any property type"));
+        }
     }
 }
