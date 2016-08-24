@@ -314,5 +314,24 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             Assert.Equal(description, entity.Properties.ElementAt(0).Description);
             Assert.Equal(propertyType, entity.Properties.ElementAt(0).PropertyType);
         }
+
+        [Theory]
+        [InlineData(null, "any description", "any type")]
+        [InlineData("", "any description", "any type")]
+        [InlineData("any name", "any description", null)]
+        [InlineData("any name", "any description", "")]
+        public void AddPropertyDefinition_WithInvalidParameters_ThrowsException(string name, string description, string propertyType)
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);          
+            target.AddEntityDefinition("entity", string.Empty);
+
+            // act
+            var entity = target.Schema.Entities.First(); 
+            Assert.ThrowsAny<ArgumentException>(() => target.AddPropertyDefinition(entity.Id, name, description, propertyType));
+        }
     }
 }
