@@ -292,5 +292,27 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             // assert
             Assert.Equal(0, target.Schema.Entities.Count());
         }
+
+        [Theory]
+        [InlineData("any name", "any description", "any type")]
+        [InlineData("any name", "", "any type")]
+        public void AddPropertyDefinition_WithValidParameters_AddsModelNode(string name, string description, string propertyType)
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);          
+            target.AddEntityDefinition("entity", string.Empty);
+
+            // act
+            var entity = target.Schema.Entities.First(); 
+            target.AddPropertyDefinition(entity.Id, name, description, propertyType);
+
+            // assert
+            Assert.Equal(name, entity.Properties.ElementAt(0).Name);
+            Assert.Equal(description, entity.Properties.ElementAt(0).Description);
+            Assert.Equal(propertyType, entity.Properties.ElementAt(0).PropertyType);
+        }
     }
 }
