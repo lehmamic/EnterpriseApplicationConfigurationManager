@@ -10,8 +10,6 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 {
     public class Project : EventSourced
     {
-        private readonly Dictionary<EntityDefinition, ConfigurationEntity> configurations = new Dictionary<EntityDefinition, ConfigurationEntity>();
-
         protected Project(Guid id)
             : base(id)
         {
@@ -25,7 +23,8 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
                 .ItemsNotNull(nameof(history))
                 .ExpectedCondition(i => i.All(e => e.SourceId == id), "The history contains events from another source object.", nameof(history));
 
-            this.Schema = new ModelDefinition(this.EventAggregator);    
+            this.Schema = new ModelDefinition(this.EventAggregator);
+            this.Configuration = new Configuration(this.EventAggregator); 
 
             this.LoadFrom(history);
         }
@@ -35,6 +34,8 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         public string Description { get; private set; }
 
         public ModelDefinition Schema { get; }
+
+        public Configuration Configuration { get; }
 
         public void SetProjectAttributes(string name, string description)
         {
