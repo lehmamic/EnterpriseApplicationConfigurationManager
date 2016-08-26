@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 using Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents;
 
@@ -16,7 +17,8 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             this.Description = description;
 
             this.EventAggregator.Subscribe<EntityDefinitionModified>(this.OnEntityDefinitionModified, e => e.EntityId == this.Id); 
-            this.EventAggregator.Subscribe<PropertyDefinitionAdded>(this.OnPropertyDefinitionAdded, e => e.ParentEntityId == this.Id);        
+            this.EventAggregator.Subscribe<PropertyDefinitionAdded>(this.OnPropertyDefinitionAdded, e => e.ParentEntityId == this.Id);
+            this.EventAggregator.Subscribe<PropertyDefinitionDeleted>(this.OnPropertyDefinitionDeletded, e => this.properties.Any(p => e.PropertyId == p.Id));        
         }
 
         public string Name { get; private set; }
@@ -35,6 +37,15 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         {
             var entity = new PropertyDefinition(this.EventAggregator, e.PropertyId, e.Name, e.Description, e.PropertyType);
             this.properties.Add(entity);
+        }
+
+        private void OnPropertyDefinitionDeletded(PropertyDefinitionDeleted e)
+        {
+            PropertyDefinition property = this.properties.FirstOrDefault(i => i.Id == e.PropertyId);
+            if(property != null)
+            {
+                this.properties.Remove(property);
+            }
         }
     }
 }

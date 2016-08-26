@@ -133,6 +133,16 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             this.Update(e);
         }
 
+        public void DeletePropertyDefinition(Guid propertyId)
+        {
+            var e = new PropertyDefinitionDeleted
+            {
+                PropertyId = propertyId
+            };
+
+            this.Update(e);
+        }
+
         private EntityDefinition GetEntityDefinition(Guid entityId)
         {
             var entity = this.Schema.Entities.SingleOrDefault(i => i.Id == entityId);
