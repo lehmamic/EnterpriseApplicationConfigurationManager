@@ -191,6 +191,22 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             Assert.Equal(description, target.Schema.Entities.ElementAt(0).Description);
         }
 
+        [Fact]
+        public void AddEntityDefinition_WithValidParameters_AddsEntity()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+
+            // act
+            target.AddEntityDefinition("any name", "any description");
+
+            // assert
+            Assert.Equal(target.Configuration.Entities.Count(), 1);
+        }
+
         [Theory]
         [InlineData(null, "any description")]
         [InlineData("", "any description")]
@@ -259,7 +275,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
         }
 
         [Fact]
-        public void DeleteEntityDefinition_WithExistingEntityId_RemovesEntity()
+        public void DeleteEntityDefinition_WithExistingEntityId_RemovesEntityDefinition()
         {
             // arrange
             var id = Guid.NewGuid();
@@ -275,6 +291,25 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
 
             // assert
             Assert.Equal(0, target.Schema.Entities.Count());
+        }
+
+        [Fact]
+        public void DeleteEntityDefinition_WithExistingEntityId_RemovesEntity()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+            target.AddEntityDefinition("initial name", "initial description");
+
+            Guid entityId = target.Schema.Entities.ElementAt(0).Id;
+
+            // act
+            target.DeleteEntityDefinition(entityId);
+
+            // assert
+            Assert.Equal(0, target.Configuration.Entities.Count());
         }
 
         [Fact]
