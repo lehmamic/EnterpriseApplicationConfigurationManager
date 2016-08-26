@@ -346,5 +346,63 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             // act
             Assert.ThrowsAny<ArgumentException>(() => target.AddPropertyDefinition(Guid.NewGuid(), "any name", "any description", "any property type"));
         }
+
+        [Theory]
+        [InlineData("any name", "any description", "any type")]
+        [InlineData("any name", "", "any type")]
+        public void ModifPropertyDefinition_WithValidParameters_AddsModelNode(string name, string description, string propertyType)
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+            target.AddEntityDefinition("initial name", "initial description");
+
+            EntityDefinition entity = target.Schema.Entities.ElementAt(0);
+            target.AddPropertyDefinition(entity.Id, "initial name", "initial description", "initial property type");
+
+            // act
+            PropertyDefinition property = entity.Properties.ElementAt(0);
+            target.ModifyPropertyDefinition(property.Id, name, description, propertyType);
+
+            // assert
+            Assert.Equal(name, property.Name);
+            Assert.Equal(description, property.Description);
+            Assert.Equal(propertyType, property.PropertyType);
+        }
+
+        [Theory]
+        [InlineData(null, "any description", "any type")]
+        [InlineData("", "any description", "any type")]
+        [InlineData("any name", "any description", null)]
+        [InlineData("any name", "any description", "")]
+        public void ModifyPropertyDefinition_WithInvalidParameters_ThrowsException(string name, string description, string propertyType)
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+
+            // act
+            Assert.ThrowsAny<ArgumentException>(() => target.ModifyPropertyDefinition(Guid.NewGuid(), name, description, propertyType));
+        }
+
+        [Fact]
+        public void ModifPropertyDefinition_WithNotExistingPropertyId_ThrowsException()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+            target.AddEntityDefinition("initial name", "initial description");
+
+            EntityDefinition entity = target.Schema.Entities.ElementAt(0);
+        
+            // act
+            Assert.ThrowsAny<ArgumentException>(() => target.ModifyPropertyDefinition(Guid.NewGuid(), "any name", "any description", "any property type"));
+        }
     }
 }

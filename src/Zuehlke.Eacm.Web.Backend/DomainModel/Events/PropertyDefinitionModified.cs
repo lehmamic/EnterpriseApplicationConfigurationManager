@@ -2,10 +2,8 @@ using System;
 
 namespace Zuehlke.Eacm.Web.Backend.DomainModel.Events
 {
-    public class PropertyDefinitionAdded : EventBase
+    public class PropertyDefinitionModified : EventBase
     {
-        public Guid ParentEntityId { get; set; }
-
         public Guid PropertyId { get; set; }
         
         public string Name { get; set; }

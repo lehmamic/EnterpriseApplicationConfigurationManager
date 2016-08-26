@@ -99,12 +99,32 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             propertyType.ArgumentNotNullOrEmpty(nameof(propertyType));
 
             // the entity gets fetched to assert its existence.
-            var entity = this.GetEntityDefinition(entityId);
+            EntityDefinition entity = this.GetEntityDefinition(entityId);
 
             var e = new PropertyDefinitionAdded
             {
-                EntityId = entity.Id,
+                ParentEntityId = entity.Id,
                 PropertyId = Guid.NewGuid(),
+                Name = name,
+                Description = description,
+                PropertyType = propertyType
+            };
+
+            this.Update(e);
+        }
+
+        public void ModifyPropertyDefinition(Guid propertyId, string name, string description, string propertyType)
+        {
+            name.ArgumentNotNullOrEmpty(nameof(name));
+            description.ArgumentNotNull(nameof(description));
+            propertyType.ArgumentNotNullOrEmpty(nameof(propertyType));
+
+            // the property gets fetched to assert its existence.
+            PropertyDefinition property = this.GetPropertyDefinition(propertyId);
+
+            var e = new PropertyDefinitionModified
+            {
+                PropertyId = property.Id,
                 Name = name,
                 Description = description,
                 PropertyType = propertyType
@@ -124,18 +144,26 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             return entity;
         }
 
+        private PropertyDefinition GetPropertyDefinition(Guid propertyId)
+        {
+            var property = this.Schema.Entities
+                .SelectMany(e => e.Properties)
+                .SingleOrDefault(i => i.Id == propertyId);
+
+            if(property == null)
+            {
+                throw new ArgumentException($"No property definition with id {propertyId} was found.", nameof(propertyId));
+            }
+
+            return property;
+        }
+
         private void OnProjectAttributesChanged(ProjectAttributesChanged e)
         {
             this.Name = e.Name;
             this.Description = e.Description;
         }
     }
-
-
-
-    
-
-
 
     public class ConfigurationEntity
     {
