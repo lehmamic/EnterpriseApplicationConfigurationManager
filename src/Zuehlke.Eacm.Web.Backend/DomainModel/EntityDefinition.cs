@@ -16,7 +16,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             this.Description = description;
 
             this.EventAggregator.Subscribe<EntityDefinitionModified>(this.OnEntityDefinitionModified, e => e.EntityId == this.Id); 
-            this.EventAggregator.Subscribe<PropertyDefinitionAdded>(this.OnPropertyDefinitionAdded, e => e.EntityId == this.Id);        
+            this.EventAggregator.Subscribe<PropertyDefinitionAdded>(this.OnPropertyDefinitionAdded, e => e.ParentEntityId == this.Id);        
         }
 
         public string Name { get; private set; }

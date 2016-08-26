@@ -1,4 +1,5 @@
 using System;
+using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 using Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents;
 
 namespace Zuehlke.Eacm.Web.Backend.DomainModel
@@ -10,7 +11,9 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         {
             this.Name = name;
             this.Description = description;
-            this.PropertyType = propertyType;      
+            this.PropertyType = propertyType;
+
+            this.EventAggregator.Subscribe<PropertyDefinitionModified>(this.OnPropertyDefinitionModified, e => e.PropertyId == this.Id);              
         }
 
         public string Name { get; private set; }
@@ -20,5 +23,12 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         public string PropertyType { get; private set; }
 
         //// public EntityDefinition Reference { get; private set; }
+
+        private void OnPropertyDefinitionModified(PropertyDefinitionModified e)
+        {
+            this.Name = e.Name;
+            this.Description = e.Description;
+            this.PropertyType = e.PropertyType;
+        }
     }
 }
