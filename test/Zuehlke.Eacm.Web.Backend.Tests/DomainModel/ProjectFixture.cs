@@ -404,5 +404,44 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             // act
             Assert.ThrowsAny<ArgumentException>(() => target.ModifyPropertyDefinition(Guid.NewGuid(), "any name", "any description", "any property type"));
         }
+
+        [Fact]
+        public void DeletePropertyDefinition_WithExistingPropertyId_RemovesModelNode()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+            target.AddEntityDefinition("initial name", "initial description");
+
+            EntityDefinition entity = target.Schema.Entities.ElementAt(0);
+            target.AddPropertyDefinition(entity.Id, "initial name", "initial description", "initial property type");
+
+            // act
+            PropertyDefinition property = entity.Properties.ElementAt(0);
+            target.DeletePropertyDefinition(property.Id);
+
+            // assert
+            Assert.Equal(0, entity.Properties.Count());
+        }
+
+        [Fact]
+        public void DeletePropertyDefinition_WithNotExistingPropertyId_DoesNotThrow()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+            target.AddEntityDefinition("initial name", "initial description");
+
+            // act
+            target.DeletePropertyDefinition(Guid.NewGuid());
+
+            // assert
+            EntityDefinition entity = target.Schema.Entities.ElementAt(0);
+            Assert.Equal(0, entity.Properties.Count());
+        }
     }
 }
