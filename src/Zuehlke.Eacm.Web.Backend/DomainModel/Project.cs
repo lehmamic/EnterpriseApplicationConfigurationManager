@@ -24,7 +24,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
                 .ExpectedCondition(i => i.All(e => e.SourceId == id), "The history contains events from another source object.", nameof(history));
 
             this.Schema = new ModelDefinition(this.EventAggregator);
-            this.Configuration = new Configuration(this.EventAggregator); 
+            this.Configuration = new Configuration(this.EventAggregator, this.Schema); 
 
             this.LoadFrom(history);
         }
@@ -144,9 +144,45 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             this.Update(e);
         }
 
-        private EntityDefinition GetEntityDefinition(Guid entityId)
+        public void AddEntry(Guid entityId, IEnumerable<object> values)
         {
             var entity = this.Schema.Entities.SingleOrDefault(i => i.Id == entityId);
+            if(entity == null)
+            {
+                throw new ArgumentException($"No entity definition with id {entityId} was found.", nameof(entityId));
+            }
+
+            if(entity.Properties.Count() != values.Count())
+            {
+                throw new ArgumentException("The amount of values does not match the amount of properties.", nameof(values));
+            }
+
+            var propertyValues = entity.Properties.Select((p, i) => new { PropertyId = p.Id, Value = values.ElementAt(i) })
+                .ToDictionary(i => i.PropertyId, i => i.Value);
+
+            var e = new ConfigurationEntryAdded
+            {
+                EntityId = entityId,
+                EntryId = Guid.NewGuid(),
+                Values = propertyValues
+            };
+
+            this.Update(e);
+        }
+
+        public void DeleteEntry(Guid entryId)
+        {
+            var e = new ConfigurationEntryDeleted
+            {
+                EntryId = entryId
+            };
+
+            this.Update(e);
+        }
+
+        private EntityDefinition GetEntityDefinition(Guid entityId)
+        {
+            EntityDefinition entity = this.Schema.Entities.SingleOrDefault(i => i.Id == entityId);
             if(entity == null)
             {
                 throw new ArgumentException($"No entity definition with id {entityId} was found.", nameof(entityId));
@@ -157,7 +193,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
         private PropertyDefinition GetPropertyDefinition(Guid propertyId)
         {
-            var property = this.Schema.Entities
+            PropertyDefinition property = this.Schema.Entities
                 .SelectMany(e => e.Properties)
                 .SingleOrDefault(i => i.Id == propertyId);
 
@@ -169,19 +205,24 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             return property;
         }
 
+        private ConfigurationEntry GetEntry(Guid entryId)
+        {
+            ConfigurationEntry entry = this.Configuration.Entities
+                .SelectMany(e => e.Entries)
+                .SingleOrDefault(i => i.Id == entryId);
+
+            if(entry == null)
+            {
+                throw new ArgumentException($"No configuration entry with id {entryId} was found.", nameof(entryId));
+            }
+
+            return entry;
+        }
+
         private void OnProjectAttributesChanged(ProjectAttributesChanged e)
         {
             this.Name = e.Name;
             this.Description = e.Description;
         }
-    }
-
-    public class ConfigurationEntity
-    {
-    }
-
-    public class ConfigurationEntry
-    {
-        private Dictionary<PropertyDefinition, string> values = new Dictionary<PropertyDefinition, string>();
     }
 }
