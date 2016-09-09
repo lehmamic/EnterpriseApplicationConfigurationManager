@@ -608,6 +608,31 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
 
             // assert
             Assert.Equal(0, target.Configuration[entity.Id].Entries.Count());
+        }
+
+        [Fact]
+        public void AddPropertyDefinition_WithWithExistingEntries_AddsConfigurationValueForProperty()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+
+            target.AddEntityDefinition("initial name", "initial description");
+            var entity = target.Schema.Entities.First();
+
+            target.AddPropertyDefinition(entity.Id, "Key", string.Empty, "Zuehlke.Eacm.String");
+            target.AddEntry(entity.Id, new object[] { "Test" });
+            var entry = target.Configuration[entity.Id].Entries.First();
+
+            // act
+            target.AddPropertyDefinition(entity.Id, "Value", string.Empty, "Zuehlke.Eacm.Integer");
+
+            // assert
+            Assert.Equal(2, entry.Values.Count());
+            Assert.Equal("Value", target.Configuration[entity.Id].Entries.ElementAt(0).Values.ElementAt(1).Property.Name);
+            Assert.Equal(null, target.Configuration[entity.Id].Entries.ElementAt(0).Values.ElementAt(1).Value);
         } 
     }
 }
