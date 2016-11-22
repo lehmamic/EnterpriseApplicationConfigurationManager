@@ -18,8 +18,9 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             this.values = values.ArgumentNotNull(nameof(values)).ToDictionary(k => k.Property.Id);
 
             this.EventAggregator.Subscribe<PropertyDefinitionAdded>(this.OnPropertyDefinitionAdded, e => e.ParentEntityId == this.Definition.Id);
-            
+            this.EventAggregator.Subscribe<PropertyDefinitionDeleted>(this.OnPropertyDefinitionDeleted);
         }
+
 
         public EntityDefinition Definition { get; }
 
@@ -35,6 +36,14 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             var value = new ConfigurationValue(this.EventAggregator, property, null);
 
             this.values.Add(property.Id, value);
+        }
+
+        private void OnPropertyDefinitionDeleted(PropertyDefinitionDeleted e)
+        {
+            if (this.values.ContainsKey(e.PropertyId))
+            {
+                this.values.Remove(e.PropertyId);
+            }
         }
     }
 }

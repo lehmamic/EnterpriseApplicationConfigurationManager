@@ -611,7 +611,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
         }
 
         [Fact]
-        public void AddPropertyDefinition_WithWithExistingEntries_AddsConfigurationValueForProperty()
+        public void AddPropertyDefinition_WithExistingEntries_AddsConfigurationValueForProperty()
         {
             // arrange
             var id = Guid.NewGuid();
@@ -633,6 +633,89 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             Assert.Equal(2, entry.Values.Count());
             Assert.Equal("Value", target.Configuration[entity.Id].Entries.ElementAt(0).Values.ElementAt(1).Property.Name);
             Assert.Equal(null, target.Configuration[entity.Id].Entries.ElementAt(0).Values.ElementAt(1).Value);
-        } 
+        }
+
+        [Fact]
+        public void ModifyPropertyDefinition_WithExistingEntriesAndNameChanged_DoesChangeConfigurationValueForProperty()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+
+            target.AddEntityDefinition("initial name", "initial description");
+            var entity = target.Schema.Entities.First();
+
+            target.AddPropertyDefinition(entity.Id, "Key", string.Empty, "Zuehlke.Eacm.String");
+            target.AddPropertyDefinition(entity.Id, "Value", string.Empty, "Zuehlke.Eacm.Integer");
+
+            target.AddEntry(entity.Id, new object[] { "Test", 10 });
+            var entry = target.Configuration[entity.Id].Entries.First();
+
+            // act
+            PropertyDefinition property = entity.Properties.Single(p => p.Name == "Value");
+            target.ModifyPropertyDefinition(property.Id, "Value2", "", "Zuehlke.Eacm.Integer");
+
+            // assert
+            Assert.Equal(2, entry.Values.Count());
+            Assert.Equal("Value2", entry.Values.ElementAt(1).Property.Name);
+            Assert.Equal(10, entry.Values.ElementAt(1).Value);
+        }
+
+        [Fact]
+        public void ModifyPropertyDefinition_WithExistingEntriesAndTypeChanged_ResetsConfigurationValueForProperty()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+
+            target.AddEntityDefinition("initial name", "initial description");
+            var entity = target.Schema.Entities.First();
+
+            target.AddPropertyDefinition(entity.Id, "Key", string.Empty, "Zuehlke.Eacm.String");
+            target.AddPropertyDefinition(entity.Id, "Value", string.Empty, "Zuehlke.Eacm.Integer");
+
+            target.AddEntry(entity.Id, new object[] { "Test", 10 });
+            var entry = target.Configuration[entity.Id].Entries.First();
+
+            // act
+            PropertyDefinition property = entity.Properties.Single(p => p.Name == "Value");
+            target.ModifyPropertyDefinition(property.Id, "Value", "", "Zuehlke.Eacm.String");
+
+            // assert
+            Assert.Equal(2, entry.Values.Count());
+            Assert.Equal("Zuehlke.Eacm.String", entry.Values.ElementAt(1).Property.PropertyType);
+            Assert.Equal(null, entry.Values.ElementAt(1).Value);
+        }
+
+        [Fact]
+        public void DeletePropertyDefinition_WithExistingEntries_RemovesConfigurationValueForProperty()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            IEnumerable<IEvent> history = new List<IEvent>();
+
+            var target = new Project(id, history);
+
+            target.AddEntityDefinition("initial name", "initial description");
+            var entity = target.Schema.Entities.First();
+
+            target.AddPropertyDefinition(entity.Id, "Key", string.Empty, "Zuehlke.Eacm.String");
+            target.AddPropertyDefinition(entity.Id, "Value", string.Empty, "Zuehlke.Eacm.Integer");
+
+            target.AddEntry(entity.Id, new object[] { "Test", 10 });
+            var entry = target.Configuration[entity.Id].Entries.First();
+
+            // act
+            PropertyDefinition property = entity.Properties.Single(p => p.Name == "Value");
+            target.DeletePropertyDefinition(property.Id);
+
+            // assert
+            Assert.Equal(1, entry.Values.Count());
+            Assert.False(entry.Definition.Properties.Any(p => p.Name == "Value"));
+        }
     }
 }
