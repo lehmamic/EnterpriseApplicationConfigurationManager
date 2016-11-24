@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 using Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents;

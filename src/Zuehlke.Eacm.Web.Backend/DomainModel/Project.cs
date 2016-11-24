@@ -1,32 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Zuehlke.Eacm.Web.Backend.CQRS;
+using CQRSlite.Domain;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 using Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents;
 
 namespace Zuehlke.Eacm.Web.Backend.DomainModel
 {
-    public class Project : EventSourced
+    public class Project : AggregateRoot
     {
-        protected Project(Guid id)
-            : base(id)
+        private readonly IEventAggregator eventAggregator = new EventAggregator();
+
+        public Project()
         {
-            this.EventAggregator.Subscribe<ProjectAttributesChanged>(this.OnProjectAttributesChanged);
         }
 
-        public Project(Guid id, IEnumerable<IEvent> history)
-            : this(id)
+        public Project(Guid id, string name)
         {
-            history.ArgumentNotNull(nameof(history))
-                .ItemsNotNull(nameof(history))
-                .ExpectedCondition(i => i.All(e => e.SourceId == id), "The history contains events from another source object.", nameof(history));
+            this.Id = id;
+            this.Schema = new ModelDefinition(this.eventAggregator);
+            this.Configuration = new Configuration(this.eventAggregator, this.Schema);
 
-            this.Schema = new ModelDefinition(this.EventAggregator);
-            this.Configuration = new Configuration(this.EventAggregator, this.Schema); 
-
-            this.LoadFrom(history);
+            var e = new ProjectCreated { Id = id, Name = name };
+            this.ApplyChange(e);
         }
 
         public string Name { get; private set; }
@@ -42,13 +39,14 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             name.ArgumentNotNullOrEmpty(nameof(name));
             description.ArgumentNotNull(nameof(description));
 
-            var e = new ProjectAttributesChanged
+            var e = new ProjectAttributesModified
             {
+                Id = Id,
                 Name = name,
                 Description = description,
             };
 
-            this.Update(e);
+            this.ApplyChange(e);
         }
 
         public void AddEntityDefinition(string name, string description)
@@ -58,12 +56,13 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
             var e = new EntityDefinitionAdded
             {
+                Id = Id,
                 EntityId = Guid.NewGuid(),
                 Name = name,
                 Description = description,
             };
 
-            this.Update(e);
+            this.ApplyChange(e);
         }
 
         public void ModifyEntityDefinition(Guid entityId, string name, string description)
@@ -75,22 +74,24 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
             var e = new EntityDefinitionModified
             {
+                Id = Id,
                 EntityId = entity.Id,
                 Name = name,
                 Description = description,
             };
 
-            this.Update(e);
+            this.ApplyChange(e);
         }
 
         public void DeleteEntityDefinition(Guid entityId)
         {
             var e = new EntityDefinitionDeleted
             {
+                Id = Id,
                 EntityId = entityId
             };
 
-            this.Update(e);
+            this.ApplyChange(e);
         }
 
         public void AddPropertyDefinition(Guid entityId, string name, string description, string propertyType)
@@ -104,6 +105,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
             var e = new PropertyDefinitionAdded
             {
+                Id = Id,
                 ParentEntityId = entity.Id,
                 PropertyId = Guid.NewGuid(),
                 Name = name,
@@ -111,7 +113,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
                 PropertyType = propertyType
             };
 
-            this.Update(e);
+            this.ApplyChange(e);
         }
 
         public void ModifyPropertyDefinition(Guid propertyId, string name, string description, string propertyType)
@@ -125,23 +127,25 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
             var e = new PropertyDefinitionModified
             {
+                Id = Id,
                 PropertyId = property.Id,
                 Name = name,
                 Description = description,
                 PropertyType = propertyType
             };
 
-            this.Update(e);
+            this.ApplyChange(e);
         }
 
         public void DeletePropertyDefinition(Guid propertyId)
         {
             var e = new PropertyDefinitionDeleted
             {
+                Id = Id,
                 PropertyId = propertyId
             };
 
-            this.Update(e);
+            this.ApplyChange(e);
         }
 
         public void AddEntry(Guid entityId, IEnumerable<object> values)
@@ -162,22 +166,24 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
             var e = new ConfigurationEntryAdded
             {
+                Id = Id,
                 EntityId = entityId,
                 EntryId = Guid.NewGuid(),
                 Values = propertyValues
             };
 
-            this.Update(e);
+            this.ApplyChange(e);
         }
 
         public void DeleteEntry(Guid entryId)
         {
             var e = new ConfigurationEntryDeleted
             {
+                Id = Id,
                 EntryId = entryId
             };
 
-            this.Update(e);
+            this.ApplyChange(e);
         }
 
         private EntityDefinition GetEntityDefinition(Guid entityId)
@@ -219,10 +225,56 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             return entry;
         }
 
-        private void OnProjectAttributesChanged(ProjectAttributesChanged e)
+        private void Apply(ProjectCreated e)
+        {
+            this.Id = e.Id;
+            this.Name = e.Name;
+        }
+
+        private void Apply(ProjectAttributesModified e)
         {
             this.Name = e.Name;
             this.Description = e.Description;
+        }
+
+        private void Apply(EntityDefinitionAdded e)
+        {
+            this.eventAggregator.Publish(e);
+        }
+
+        private void Apply(EntityDefinitionModified e)
+        {
+            this.eventAggregator.Publish(e);
+        }
+
+        private void Apply(EntityDefinitionDeleted e)
+        {
+            this.eventAggregator.Publish(e);
+        }
+
+        private void Apply(PropertyDefinitionAdded e)
+        {
+            this.eventAggregator.Publish(e);
+        }
+
+        private void Apply(PropertyDefinitionModified e)
+        {
+            this.eventAggregator.Publish(e);
+        }
+
+        private void Apply(PropertyDefinitionDeleted e)
+        {
+            this.eventAggregator.Publish(e);
+        }
+
+        private void Apply(ConfigurationEntryAdded e)
+        {
+            this.eventAggregator.Publish(e);
+        }
+
+        private void Apply(ConfigurationEntryDeleted e)
+        {
+            this.eventAggregator.Publish(e);
         }
     }
 }
