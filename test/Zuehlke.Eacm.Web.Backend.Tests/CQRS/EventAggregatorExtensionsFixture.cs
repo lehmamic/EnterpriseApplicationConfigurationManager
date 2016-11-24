@@ -1,9 +1,10 @@
 using System;
+using CQRSlite.Events;
 using Xunit;
-using Zuehlke.Eacm.Web.Backend.CQRS;
+using Zuehlke.Eacm.Web.Backend.DomainModel;
 using Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents;
 
-namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
+namespace Zuehlke.Eacm.Web.Backend.Tests.CQRS
 {
     public class EventAggregatorExtensionsFixture
     {
@@ -15,7 +16,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             IEvent e = new TestEvent();
 
             // act
-            Assert.ThrowsAny<ArgumentNullException>(() => CQRS.EventAggregatorExtensions.PublishEvent(eventAggegator, e));
+            Assert.ThrowsAny<ArgumentNullException>(() => eventAggegator.PublishEvent(e));
         }
 
         [Fact]
@@ -26,7 +27,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             IEvent e = null;
 
             // act
-            Assert.ThrowsAny<ArgumentNullException>(() => CQRS.EventAggregatorExtensions.PublishEvent(eventAggegator, e));
+            Assert.ThrowsAny<ArgumentNullException>(() => eventAggegator.PublishEvent(e));
         }
 
         [Fact]
@@ -41,59 +42,18 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
             eventAggegator.Subscribe<TestEvent>(ev => executed = true);
 
             // act
-            CQRS.EventAggregatorExtensions.PublishEvent(eventAggegator, e);
+            eventAggegator.PublishEvent(e);
 
             Assert.True(executed);
         }
 
         private class TestEvent : IEvent
         {
-            public Guid CorrelationId
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
+            public Guid Id { get; set; }
 
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
+            public int Version { get; set; }
 
-            public Guid Id
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public Guid SourceId
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public DateTime Timestamp
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
+            public DateTimeOffset TimeStamp { get; set; }
         }
     }
 }
