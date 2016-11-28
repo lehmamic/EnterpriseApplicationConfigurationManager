@@ -41,7 +41,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
             var e = new ProjectAttributesModified
             {
-                Id = Id,
+                Id = this.Id,
                 Name = name,
                 Description = description,
             };
@@ -56,7 +56,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
             var e = new EntityDefinitionAdded
             {
-                Id = Id,
+                Id = this.Id,
                 EntityId = Guid.NewGuid(),
                 Name = name,
                 Description = description,
@@ -74,7 +74,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
             var e = new EntityDefinitionModified
             {
-                Id = Id,
+                Id = this.Id,
                 EntityId = entity.Id,
                 Name = name,
                 Description = description,
@@ -87,7 +87,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         {
             var e = new EntityDefinitionDeleted
             {
-                Id = Id,
+                Id = this.Id,
                 EntityId = entityId
             };
 
@@ -105,7 +105,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
             var e = new PropertyDefinitionAdded
             {
-                Id = Id,
+                Id = this.Id,
                 ParentEntityId = entity.Id,
                 PropertyId = Guid.NewGuid(),
                 Name = name,
@@ -141,7 +141,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         {
             var e = new PropertyDefinitionDeleted
             {
-                Id = Id,
+                Id = this.Id,
                 PropertyId = propertyId
             };
 
@@ -166,9 +166,33 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
             var e = new ConfigurationEntryAdded
             {
-                Id = Id,
+                Id = this.Id,
                 EntityId = entityId,
                 EntryId = Guid.NewGuid(),
+                Values = propertyValues
+            };
+
+            this.ApplyChange(e);
+        }
+
+        public void ModifyEntry(Guid entryId, IEnumerable<object> values)
+        {
+            values.ArgumentNotNull(nameof(values));
+
+            var entry = this.GetEntry(entryId);
+
+            if(entry.Definition.Properties.Count() != values.Count())
+            {
+                throw new ArgumentException("The amount of values does not match the amount of properties.", nameof(values));
+            }
+
+            var propertyValues = entry.Definition.Properties.Select((p, i) => new { PropertyId = p.Id, Value = values.ElementAt(i) })
+                .ToDictionary(i => i.PropertyId, i => i.Value);
+
+            var e = new ConfigurationEntryModified
+            {
+                Id = this.Id,
+                EntryId = entryId,
                 Values = propertyValues
             };
 
@@ -179,7 +203,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         {
             var e = new ConfigurationEntryDeleted
             {
-                Id = Id,
+                Id = this.Id,
                 EntryId = entryId
             };
 
@@ -268,6 +292,11 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         }
 
         private void Apply(ConfigurationEntryAdded e)
+        {
+            this.eventAggregator.Publish(e);
+        }
+
+        private void Apply(ConfigurationEntryModified e)
         {
             this.eventAggregator.Publish(e);
         }

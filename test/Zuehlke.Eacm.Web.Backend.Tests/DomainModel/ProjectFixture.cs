@@ -412,6 +412,88 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DomainModel
         }
 
         [Fact]
+        public void ModifyEntry_WithValidParameters_ModifiesEntryValues()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+
+            var target = new Project(id, "initial");
+            target.AddEntityDefinition("initial name", "initial description");
+
+            var entity = target.Schema.Entities.First();
+
+            target.AddPropertyDefinition(entity.Id, "Key", string.Empty, "Zuehlke.Eacm.String");
+            target.AddPropertyDefinition(entity.Id, "Value", string.Empty, "Zuehlke.Eacm.Integer");
+            target.AddEntry(entity.Id, new object[] { "Test", 10 });
+
+            // act
+            var entry = target.Configuration.Entities.First().Entries.First();
+            target.ModifyEntry(entry.Id, new object[] { "AnotherTest", 23 });
+
+            // assert
+            Assert.Equal(1, target.Configuration[entity.Id].Entries.Count());
+            Assert.Equal(2, target.Configuration[entity.Id].Entries.ElementAt(0).Values.Count());
+            Assert.Equal("Key", target.Configuration[entity.Id].Entries.ElementAt(0).Values.ElementAt(0).Property.Name);
+            Assert.Equal("AnotherTest", target.Configuration[entity.Id].Entries.ElementAt(0).Values.ElementAt(0).Value);
+            Assert.Equal("Value", target.Configuration[entity.Id].Entries.ElementAt(0).Values.ElementAt(1).Property.Name);
+            Assert.Equal(23, target.Configuration[entity.Id].Entries.ElementAt(0).Values.ElementAt(1).Value);
+        }
+
+        [Fact]
+        public void ModifyEntry_WithValuesAreNull_ThrowsException()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+
+            var target = new Project(id, "initial");
+            target.AddEntityDefinition("initial name", "initial description");
+
+            var entity = target.Schema.Entities.First();
+
+            target.AddPropertyDefinition(entity.Id, "Key", string.Empty, "Zuehlke.Eacm.String");
+            target.AddPropertyDefinition(entity.Id, "Value", string.Empty, "Zuehlke.Eacm.Integer");
+
+            // act
+            Assert.ThrowsAny<ArgumentNullException>(() => target.ModifyEntry(Guid.NewGuid(), null));
+        }
+
+        [Fact]
+        public void ModifyEntry_WithValuesCountDoesNotMatchPropertyAmount_ThrowsException()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+
+            var target = new Project(id, "initial");
+            target.AddEntityDefinition("initial name", "initial description");
+
+            var entity = target.Schema.Entities.First();
+
+            target.AddPropertyDefinition(entity.Id, "Key", string.Empty, "Zuehlke.Eacm.String");
+            target.AddPropertyDefinition(entity.Id, "Value", string.Empty, "Zuehlke.Eacm.Integer");
+
+            // act
+            Assert.ThrowsAny<ArgumentException>(() => target.ModifyEntry(Guid.NewGuid(), new object[] { 23 }));
+        }
+
+        [Fact]
+        public void ModifyEntry_WithNotExistingEntryId_ThrowsException()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+
+            var target = new Project(id, "initial");
+            target.AddEntityDefinition("initial name", "initial description");
+
+            var entity = target.Schema.Entities.First();
+
+            target.AddPropertyDefinition(entity.Id, "Key", string.Empty, "Zuehlke.Eacm.String");
+            target.AddPropertyDefinition(entity.Id, "Value", string.Empty, "Zuehlke.Eacm.Integer");
+
+            // act
+            Assert.ThrowsAny<ArgumentException>(() => target.ModifyEntry(Guid.NewGuid(), new object[] { "AnotherTest", 23 }));
+        }
+
+        [Fact]
         public void DeleteEntry_WithExistingEntry_RemovesTheEntryFromTheEntity()
         {
             // arrange

@@ -19,8 +19,8 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
 
             this.EventAggregator.Subscribe<PropertyDefinitionAdded>(this.OnPropertyDefinitionAdded, e => e.ParentEntityId == this.Definition.Id);
             this.EventAggregator.Subscribe<PropertyDefinitionDeleted>(this.OnPropertyDefinitionDeleted);
+            this.EventAggregator.Subscribe<ConfigurationEntryModified>(this.OnConfigurationEntryModified, e => e.EntryId == this.Id);
         }
-
 
         public EntityDefinition Definition { get; }
 
@@ -44,6 +44,19 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             {
                 this.values.Remove(e.PropertyId);
             }
+        }
+
+        private void OnConfigurationEntryModified(ConfigurationEntryModified e)
+        {
+            foreach (var propertyId in e.Values.Keys)
+            {
+                this.values[propertyId] = CreateConfigurationValue(propertyId, e.Values[propertyId]);
+            }
+        }
+
+        private ConfigurationValue CreateConfigurationValue(Guid propertyId, object value)
+        {
+            return new ConfigurationValue(this.EventAggregator, this.Definition.Properties.Single(p => p.Id == propertyId), value);
         }
     }
 }
