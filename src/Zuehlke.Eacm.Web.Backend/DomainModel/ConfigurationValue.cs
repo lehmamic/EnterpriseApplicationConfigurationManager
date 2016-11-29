@@ -1,3 +1,4 @@
+using System;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 using Zuehlke.Eacm.Web.Backend.Utils.PubSubEvents;
@@ -9,9 +10,9 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         private string currentPropertyType;
 
         public ConfigurationValue(IEventAggregator eventAggregator, PropertyDefinition property, object value)
-            : base(eventAggregator, property.ArgumentNotNull(nameof(property)).Id)
+            : base(eventAggregator, Guid.NewGuid())
         {
-            this.Property = property;
+            this.Property = property.ArgumentNotNull(nameof(property));
             this.Value = value;
 
             this.currentPropertyType = this.Property.PropertyType;
