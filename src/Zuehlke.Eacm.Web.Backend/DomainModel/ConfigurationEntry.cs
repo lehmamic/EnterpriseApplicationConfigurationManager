@@ -12,7 +12,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         private readonly Dictionary<Guid, ConfigurationValue> values;
         
         public ConfigurationEntry(IEventAggregator eventAggregator, EntityDefinition entityDefinition, Guid entryId, IEnumerable<ConfigurationValue> values)
-            : base(eventAggregator, entityDefinition.ArgumentNotNull(nameof(entityDefinition)).Id)
+            : base(eventAggregator, entryId)
         {
             this.Definition = entityDefinition.ArgumentNotNull(nameof(entityDefinition));
             this.values = values.ArgumentNotNull(nameof(values)).ToDictionary(k => k.Property.Id);
