@@ -15,7 +15,10 @@ namespace Zuehlke.Eacm.Web.Backend.DataAccess
         public string AggregateType { get; set; }
 
         [Required]
-        public DateTime Timestamp { get; set; }
+        public DateTimeOffset Timestamp { get; set; }
+
+        [Required]
+        public int Version { get; set; }
 
         [Required]
         public string Payload { get; set; }
