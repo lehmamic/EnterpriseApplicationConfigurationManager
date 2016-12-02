@@ -87,5 +87,35 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DataAccess
             // assert
             Assert.Equal(1, actual.Count());
         }
+
+        [Fact]
+        public void Get_WithEventsFromOtherAggregateRoot_ReturnsOnlyEventsFromRequestedAggregateRoot()
+        {
+            // arrange
+            var aggregateRootId = Guid.NewGuid();
+
+            var events = new IEvent[]
+            {
+                new ProjectCreated { Id = aggregateRootId, Name = "AnyName", TimeStamp = DateTimeOffset.Now, Version = 1 },
+                new ProjectAttributesModified { Id = aggregateRootId, Name = "AnyName", Description = "Any Descrition", TimeStamp = DateTimeOffset.Now, Version = 2 },
+            };
+
+            var serializer = new JsonTextSerializer();
+            var publisher = new Mock<IEventPublisher>();
+
+            var target = new EventStore(this.DbContext, serializer, publisher.Object);
+            target.Save<Project>(events);
+            target.Save<TestAggregateRoot>(events);
+
+            // act
+            IEnumerable<IEvent> actual = target.Get<Project>(aggregateRootId, 0);
+
+            // assert
+            Assert.Equal(2, actual.Count());
+        }
+
+        private class TestAggregateRoot
+        {
+        }
     }
 }
