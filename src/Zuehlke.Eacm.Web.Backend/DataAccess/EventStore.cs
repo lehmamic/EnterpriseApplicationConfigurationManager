@@ -31,7 +31,7 @@ namespace Zuehlke.Eacm.Web.Backend.DataAccess
                 {
                     Id = Guid.NewGuid(),
                     AggregateId = e.Id,
-                    AggregateType = nameof(T),
+                    AggregateType = typeof(T).Name,
                     Timestamp = e.TimeStamp,
                     Version = e.Version,
                     Payload = this.Serialize(e)
@@ -47,10 +47,10 @@ namespace Zuehlke.Eacm.Web.Backend.DataAccess
         public IEnumerable<IEvent> Get<T>(Guid aggregateId, int fromVersion)
         {
             return this.dbContext.Events
-                .Where(e => e.AggregateId == aggregateId && e.Version > fromVersion)
+                .Where(e => e.AggregateId == aggregateId && e.AggregateType == typeof(T).Name)
+                .Where(e => e.Version > fromVersion)
                 .Select(e => this.Deserialize(e.Payload))
                 .OrderByDescending(e => e.Version);
-
         }
 
         private string Serialize(IEvent @event)
