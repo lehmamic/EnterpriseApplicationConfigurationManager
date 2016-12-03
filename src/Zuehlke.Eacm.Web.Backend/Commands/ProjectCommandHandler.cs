@@ -31,7 +31,7 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.session.Get<Project>(message.Id);
+            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.SetProjectAttributes(message.Name, message.Description);
 
             this.session.Commit();
