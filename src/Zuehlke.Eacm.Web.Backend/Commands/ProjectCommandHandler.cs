@@ -1,5 +1,4 @@
-﻿using System;
-using CQRSlite.Commands;
+﻿using CQRSlite.Commands;
 using CQRSlite.Domain;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.DomainModel;
@@ -8,7 +7,10 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
 {
     public class ProjectCommandHandler :
         ICommandHandler<CreateProjectCommand>,
-        ICommandHandler<ModifyProjectAttributesCommand>
+        ICommandHandler<ModifyProjectAttributesCommand>,
+        ICommandHandler<CreateEntityCommand>,
+        ICommandHandler<ModifyEntityCommand>,
+        ICommandHandler<DeleteEntityCommand>
     {
         private readonly ISession session;
 
@@ -33,6 +35,36 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
 
             var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.SetProjectAttributes(message.Name, message.Description);
+
+            this.session.Commit();
+        }
+
+        public void Handle(CreateEntityCommand message)
+        {
+            message.ArgumentNotNull(nameof(message));
+
+            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            project.AddEntityDefinition(message.Name, message.Description);
+
+            this.session.Commit();
+        }
+
+        public void Handle(ModifyEntityCommand message)
+        {
+            message.ArgumentNotNull(nameof(message));
+
+            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            project.ModifyEntityDefinition(message.EntityId, message.Name, message.Description);
+
+            this.session.Commit();
+        }
+
+        public void Handle(DeleteEntityCommand message)
+        {
+            message.ArgumentNotNull(nameof(message));
+
+            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            project.DeleteEntityDefinition(message.EntityId);
 
             this.session.Commit();
         }
