@@ -143,11 +143,110 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.Commands
             session.Verify(s => s.Commit());
         }
 
+        [Fact]
+        public void Hanlde_CreatePropertyCommand_AddsPropertyDefinitionToProject()
+        {
+            // arrange
+            var project = CreateProject();
+            var entity = project.Schema.Entities.First();
+
+            var command = new CreatePropertyCommand
+            {
+                Id = project.Id,
+                ParentEntityId = entity.Id,
+                Name = "NewPropertyName",
+                Description = "NewPropertyDescription",
+                PropertyType = "Zuehlke.Eacm.String"
+            };
+
+            var session = new Mock<ISession>();
+            session.Setup(s => s.Get<Project>(project.Id, command.ExpectedVersion)).Returns(project);
+
+            var target = new ProjectCommandHandler(session.Object);
+
+            // act
+            target.Handle(command);
+
+            // assert
+            var propertyDefinition = entity.Properties.FirstOrDefault(p => p.Name == command.Name);
+
+            Assert.NotNull(propertyDefinition);
+            Assert.Equal(command.Name, propertyDefinition.Name);
+            Assert.Equal(command.Description, propertyDefinition.Description);
+            Assert.Equal(command.PropertyType, propertyDefinition.PropertyType);
+            session.Verify(s => s.Commit());
+        }
+
+        [Fact]
+        public void Hanlde_ModifyPropertyCommand_ModifiesPropertyDefinitionInProject()
+        {
+            // arrange
+            var project = CreateProject();
+            var entity = project.Schema.Entities.First();
+            var property = entity.Properties.First();
+
+            var command = new ModifyPropertyCommand
+            {
+                Id = project.Id,
+                PropertyId = property.Id,
+                Name = "NewPropertyName",
+                Description = "NewPropertyDescription",
+                PropertyType = "Zuehlke.Eacm.Integer"
+            };
+
+            var session = new Mock<ISession>();
+            session.Setup(s => s.Get<Project>(project.Id, command.ExpectedVersion)).Returns(project);
+
+            var target = new ProjectCommandHandler(session.Object);
+
+            // act
+            target.Handle(command);
+
+            // assert
+            var propertyDefinition = entity.Properties.FirstOrDefault(p => p.Id == property.Id);
+
+            Assert.Equal(command.Name, propertyDefinition.Name);
+            Assert.Equal(command.Description, propertyDefinition.Description);
+            Assert.Equal(command.PropertyType, propertyDefinition.PropertyType);
+            session.Verify(s => s.Commit());
+        }
+
+        [Fact]
+        public void Hanlde_DeletePropertyCommand_RemovesPropertyDefinitionFromProject()
+        {
+            // arrange
+            var project = CreateProject();
+            var entity = project.Schema.Entities.First();
+            var property = entity.Properties.First();
+
+            var command = new DeletePropertyCommand
+            {
+                Id = project.Id,
+                PropertyId = property.Id
+            };
+
+            var session = new Mock<ISession>();
+            session.Setup(s => s.Get<Project>(project.Id, command.ExpectedVersion)).Returns(project);
+
+            var target = new ProjectCommandHandler(session.Object);
+
+            // act
+            target.Handle(command);
+
+            // assert
+            var entityDefinition = entity.Properties.FirstOrDefault(e => e.Id == property.Id);
+
+            Assert.Null(entityDefinition);
+            session.Verify(s => s.Commit());
+        }
+
         private static Project CreateProject()
         {
             var project = new Project(Guid.NewGuid(), "InitialProjectName");
-
             project.AddEntityDefinition("Initial Entity", string.Empty);
+
+            var entity = project.Schema.Entities.First();
+            project.AddPropertyDefinition(entity.Id, "Initial Property", string.Empty, "Zuehlke.Eacm.String");
 
             return project;
         }

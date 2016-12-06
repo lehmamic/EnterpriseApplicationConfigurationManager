@@ -10,7 +10,10 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
         ICommandHandler<ModifyProjectAttributesCommand>,
         ICommandHandler<CreateEntityCommand>,
         ICommandHandler<ModifyEntityCommand>,
-        ICommandHandler<DeleteEntityCommand>
+        ICommandHandler<DeleteEntityCommand>,
+        ICommandHandler<CreatePropertyCommand>,
+        ICommandHandler<ModifyPropertyCommand>,
+        ICommandHandler<DeletePropertyCommand>
     {
         private readonly ISession session;
 
@@ -65,6 +68,36 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
 
             var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.DeleteEntityDefinition(message.EntityId);
+
+            this.session.Commit();
+        }
+
+        public void Handle(CreatePropertyCommand message)
+        {
+            message.ArgumentNotNull(nameof(message));
+
+            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            project.AddPropertyDefinition(message.ParentEntityId, message.Name, message.Description, message.PropertyType);
+
+            this.session.Commit();
+        }
+
+        public void Handle(ModifyPropertyCommand message)
+        {
+            message.ArgumentNotNull(nameof(message));
+
+            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            project.ModifyPropertyDefinition(message.PropertyId, message.Name, message.Description, message.PropertyType);
+
+            this.session.Commit();
+        }
+
+        public void Handle(DeletePropertyCommand message)
+        {
+            message.ArgumentNotNull(nameof(message));
+
+            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            project.DeletePropertyDefinition(message.PropertyId);
 
             this.session.Commit();
         }
