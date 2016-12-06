@@ -13,7 +13,10 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
         ICommandHandler<DeleteEntityCommand>,
         ICommandHandler<CreatePropertyCommand>,
         ICommandHandler<ModifyPropertyCommand>,
-        ICommandHandler<DeletePropertyCommand>
+        ICommandHandler<DeletePropertyCommand>,
+        ICommandHandler<CreateEntryCommand>,
+        ICommandHandler<ModifyEntryCommand>,
+        ICommandHandler<DeleteEntryCommand>
     {
         private readonly ISession session;
 
@@ -98,6 +101,36 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
 
             var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.DeletePropertyDefinition(message.PropertyId);
+
+            this.session.Commit();
+        }
+
+        public void Handle(CreateEntryCommand message)
+        {
+            message.ArgumentNotNull(nameof(message));
+
+            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            project.AddEntry(message.EntityId, message.Values);
+
+            this.session.Commit();
+        }
+
+        public void Handle(ModifyEntryCommand message)
+        {
+            message.ArgumentNotNull(nameof(message));
+
+            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            project.ModifyEntry(message.EntryId, message.Values);
+
+            this.session.Commit();
+        }
+
+        public void Handle(DeleteEntryCommand message)
+        {
+            message.ArgumentNotNull(nameof(message));
+
+            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            project.DeleteEntry(message.EntryId);
 
             this.session.Commit();
         }

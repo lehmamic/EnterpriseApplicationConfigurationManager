@@ -240,6 +240,91 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.Commands
             session.Verify(s => s.Commit());
         }
 
+        [Fact]
+        public void Hanlde_CreateEntryCommand_AddsEntryToProject()
+        {
+            // arrange
+            var project = CreateProject();
+            var entity = project.Schema.Entities.First();
+
+            var command = new CreateEntryCommand
+            {
+                Id = project.Id,
+                EntityId = entity.Id,
+                Values = new object[] { "Any Value" }
+            };
+
+            var session = new Mock<ISession>();
+            session.Setup(s => s.Get<Project>(project.Id, command.ExpectedVersion)).Returns(project);
+
+            var target = new ProjectCommandHandler(session.Object);
+
+            // act
+            target.Handle(command);
+
+            // assert
+            var entry = project.Configuration.Entities.First().Entries.Last();
+
+            Assert.NotNull(entry);
+            Assert.Equal(command.Values, entry.Values.Select(v => v.Value));
+            session.Verify(s => s.Commit());
+        }
+
+        [Fact]
+        public void Hanlde_ModifyEntryCommand_UpdatesEntryValuesInProject()
+        {
+            // arrange
+            var project = CreateProject();
+            var entry = project.Configuration.Entities.First().Entries.First();
+
+            var command = new ModifyEntryCommand
+            {
+                Id = project.Id,
+                EntryId = entry.Id,
+                Values = new object [] { "A modifed value" }
+            };
+
+            var session = new Mock<ISession>();
+            session.Setup(s => s.Get<Project>(project.Id, command.ExpectedVersion)).Returns(project);
+
+            var target = new ProjectCommandHandler(session.Object);
+
+            // act
+            target.Handle(command);
+
+            // assert
+            Assert.Equal(command.Values, entry.Values.Select(v => v.Value));
+            session.Verify(s => s.Commit());
+        }
+
+        [Fact]
+        public void Hanlde_DeleteEntryCommand_RemovesEntryFromProject()
+        {
+            // arrange
+            var project = CreateProject();
+            var entryId = project.Configuration.Entities.First().Entries.First().Id;
+
+            var command = new DeleteEntryCommand
+            {
+                Id = project.Id,
+                EntryId = entryId
+            };
+
+            var session = new Mock<ISession>();
+            session.Setup(s => s.Get<Project>(project.Id, command.ExpectedVersion)).Returns(project);
+
+            var target = new ProjectCommandHandler(session.Object);
+
+            // act
+            target.Handle(command);
+
+            // assert
+            var entry = project.Configuration.Entities.First().Entries.FirstOrDefault(e => e.Id == entryId);
+
+            Assert.Null(entry);
+            session.Verify(s => s.Commit());
+        }
+
         private static Project CreateProject()
         {
             var project = new Project(Guid.NewGuid(), "InitialProjectName");
@@ -247,6 +332,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.Commands
 
             var entity = project.Schema.Entities.First();
             project.AddPropertyDefinition(entity.Id, "Initial Property", string.Empty, "Zuehlke.Eacm.String");
+            project.AddEntry(entity.Id, new object[] { "Yes it is a value" });
 
             return project;
         }
