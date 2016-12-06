@@ -7,8 +7,6 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
     {
         public Guid Id { get; set; }
 
-        public Guid ParentEntityId { get; set; }
-
         public Guid PropertyId { get; set; }
 
         public int ExpectedVersion { get; set; }
