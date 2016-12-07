@@ -39,7 +39,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             name.ArgumentNotNullOrEmpty(nameof(name));
             description.ArgumentNotNull(nameof(description));
 
-            var e = new ProjectAttributesModified
+            var e = new ProjectModified
             {
                 Id = this.Id,
                 Name = name,
@@ -255,7 +255,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
             this.Name = e.Name;
         }
 
-        private void Apply(ProjectAttributesModified e)
+        private void Apply(ProjectModified e)
         {
             this.Name = e.Name;
             this.Description = e.Description;

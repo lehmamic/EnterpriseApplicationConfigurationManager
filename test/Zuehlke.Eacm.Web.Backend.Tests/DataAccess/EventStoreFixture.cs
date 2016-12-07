@@ -5,6 +5,7 @@ using CQRSlite.Events;
 using Moq;
 using Xunit;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
+using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.DomainModel;
 using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 using Zuehlke.Eacm.Web.Backend.Tests.FixtureSupport;
@@ -12,8 +13,15 @@ using Zuehlke.Eacm.Web.Backend.Utils.Serialization;
 
 namespace Zuehlke.Eacm.Web.Backend.Tests.DataAccess
 {
-    public class EventStoreFixture : DatabaseFixture
+    public class EventStoreFixture : IClassFixture<DatabaseFixture>
     {
+        private readonly DatabaseFixture context;
+
+        public EventStoreFixture(DatabaseFixture context)
+        {
+            this.context = context.ArgumentNotNull(nameof(context));
+        }
+
         [Fact]
         public void Save_WithEvents_SavesEventsInDbContext()
         {
@@ -23,19 +31,19 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DataAccess
             var events = new IEvent[]
             {
                 new ProjectCreated { Id = aggregateRootId, Name = "AnyName", TimeStamp = DateTimeOffset.Now, Version = 1 },
-                new ProjectAttributesModified { Id = aggregateRootId, Name = "AnyName", Description = "Any Descrition", TimeStamp = DateTimeOffset.Now, Version = 2 },
+                new ProjectModified { Id = aggregateRootId, Name = "AnyName", Description = "Any Descrition", TimeStamp = DateTimeOffset.Now, Version = 2 },
             };
 
             var serializer = new JsonTextSerializer();
             var publisher = new Mock<IEventPublisher>();
 
-            var target = new EventStore(this.DbContext, serializer, publisher.Object);
+            var target = new EventStore(this.context.DbContext, serializer, publisher.Object);
 
             // act
             target.Save<Project>(events);
 
             // assert
-            Assert.Equal(2, this.DbContext.Events.Count());
+            Assert.Equal(2, this.context.DbContext.Events.Count());
         }
 
         [Fact]
@@ -47,13 +55,13 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DataAccess
             var events = new IEvent[]
             {
                 new ProjectCreated { Id = aggregateRootId, Name = "AnyName", TimeStamp = DateTimeOffset.Now, Version = 1 },
-                new ProjectAttributesModified { Id = aggregateRootId, Name = "AnyName", Description = "Any Descrition", TimeStamp = DateTimeOffset.Now, Version = 2 },
+                new ProjectModified { Id = aggregateRootId, Name = "AnyName", Description = "Any Descrition", TimeStamp = DateTimeOffset.Now, Version = 2 },
             };
 
             var serializer = new JsonTextSerializer();
             var publisher = new Mock<IEventPublisher>();
 
-            var target = new EventStore(this.DbContext, serializer, publisher.Object);
+            var target = new EventStore(this.context.DbContext, serializer, publisher.Object);
             target.Save<Project>(events);
 
             // act
@@ -72,13 +80,13 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DataAccess
             var events = new IEvent[]
             {
                 new ProjectCreated { Id = aggregateRootId, Name = "AnyName", TimeStamp = DateTimeOffset.Now, Version = 1 },
-                new ProjectAttributesModified { Id = aggregateRootId, Name = "AnyName", Description = "Any Descrition", TimeStamp = DateTimeOffset.Now, Version = 2 },
+                new ProjectModified { Id = aggregateRootId, Name = "AnyName", Description = "Any Descrition", TimeStamp = DateTimeOffset.Now, Version = 2 },
             };
 
             var serializer = new JsonTextSerializer();
             var publisher = new Mock<IEventPublisher>();
 
-            var target = new EventStore(this.DbContext, serializer, publisher.Object);
+            var target = new EventStore(this.context.DbContext, serializer, publisher.Object);
             target.Save<Project>(events);
 
             // act
@@ -97,13 +105,13 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DataAccess
             var events = new IEvent[]
             {
                 new ProjectCreated { Id = aggregateRootId, Name = "AnyName", TimeStamp = DateTimeOffset.Now, Version = 1 },
-                new ProjectAttributesModified { Id = aggregateRootId, Name = "AnyName", Description = "Any Descrition", TimeStamp = DateTimeOffset.Now, Version = 2 },
+                new ProjectModified { Id = aggregateRootId, Name = "AnyName", Description = "Any Descrition", TimeStamp = DateTimeOffset.Now, Version = 2 },
             };
 
             var serializer = new JsonTextSerializer();
             var publisher = new Mock<IEventPublisher>();
 
-            var target = new EventStore(this.DbContext, serializer, publisher.Object);
+            var target = new EventStore(this.context.DbContext, serializer, publisher.Object);
             target.Save<Project>(events);
             target.Save<TestAggregateRoot>(events);
 

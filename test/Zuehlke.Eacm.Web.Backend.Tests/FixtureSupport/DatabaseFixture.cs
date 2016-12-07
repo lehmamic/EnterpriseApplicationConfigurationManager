@@ -1,19 +1,27 @@
 ﻿using System;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
+using Zuehlke.Eacm.Web.Backend.ReadModel;
 
 namespace Zuehlke.Eacm.Web.Backend.Tests.FixtureSupport
 {
-    public abstract class DatabaseFixture : IDisposable
+    public class DatabaseFixture : IDisposable
     {
         private bool disposed;
 
-        protected DatabaseFixture()
+        public DatabaseFixture()
         {
             var builder = new DbContextOptionsBuilder<EacmDbContext>();
             builder.UseInMemoryDatabase();
 
             this.DbContext = new EacmDbContext(builder.Options);
+
+            var config = new MapperConfiguration(cfg => {
+                cfg.AddProfile<ReadModelProfile>();
+            });
+
+            this.Mapper = new Mapper(config);
         }
 
         ~DatabaseFixture()
@@ -22,6 +30,8 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.FixtureSupport
         }
 
         public EacmDbContext DbContext { get; }
+
+        public IMapper Mapper { get; }
 
         public void Dispose()
         {
