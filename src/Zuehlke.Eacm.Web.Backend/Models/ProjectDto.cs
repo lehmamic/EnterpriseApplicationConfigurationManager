@@ -1,9 +1,8 @@
 ﻿using System;
-using CQRSlite.Events;
 
-namespace Zuehlke.Eacm.Web.Backend.DomainModel.Events
+namespace Zuehlke.Eacm.Web.Backend.Models
 {
-    public class ProjectAttributesModified : IEvent
+    public class ProjectDto
     {
         public Guid Id { get; set; }
 
