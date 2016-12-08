@@ -85,7 +85,43 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             {
                 Id = initialProject.Id,
                 EntityId = Guid.NewGuid(),
-                Version = 1,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now,
+                Name = "New Entity Name",
+                Description = "new Entity Description"
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
+            Assert.Equal(message.Id, project.Id);
+            Assert.Equal(message.Version, project.Version);
+            Assert.Equal(message.TimeStamp, project.TimeStamp);
+
+            var entity = this.context.DbContext.Entities.FirstOrDefault(p => p.Id == message.EntityId);
+            Assert.NotNull(entity);
+            Assert.Equal(message.EntityId, entity.Id);
+            Assert.Equal(message.Id, entity.ProjectId);
+            Assert.Equal(message.Name, entity.Name);
+            Assert.Equal(message.Description, entity.Description);
+        }
+
+        [Fact]
+        public void Handle_EntityDefinitionModifiedEvent_CreatesEntity()
+        {
+            // arrange
+            var initialProject = this.context.DbContext.Projects.First();
+            var initialEntity = this.context.DbContext.Entities.First();
+
+            var message = new EntityDefinitionModified
+            {
+                Id = initialProject.Id,
+                EntityId = initialEntity.Id,
+                Version = 2,
                 TimeStamp = DateTimeOffset.Now,
                 Name = "New Entity Name",
                 Description = "new Entity Description"
@@ -120,7 +156,17 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
                 Name = "Initial project name"
             };
 
+            var entity = new ConfigurationEntity
+            {
+                Id = Guid.NewGuid(),
+                Name = "Initial entity name",
+                Description = "Initial entity description",
+                ProjectId = project.Id
+            };
+
             this.context.DbContext.Projects.Add(project);
+            this.context.DbContext.Entities.Add(entity);
+
             this.context.DbContext.SaveChanges();
         }
     }
