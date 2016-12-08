@@ -33,7 +33,7 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = mapper.Map<ConfigurationProject>(message);
+            var project = this.mapper.Map<ConfigurationProject>(message);
             this.dbContext.Projects.Add(project);
 
             this.dbContext.SaveChanges();
@@ -44,7 +44,7 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
             message.ArgumentNotNull(nameof(message));
 
             var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
-            mapper.Map(message, project);
+            this.mapper.Map(message, project);
 
             this.dbContext.SaveChanges();
         }
@@ -53,7 +53,10 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         {
             message.ArgumentNotNull(nameof(message));
 
-            var entity = mapper.Map<ConfigurationEntity>(message);
+            var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
+            this.mapper.Map(message, project);
+
+            var entity = this.mapper.Map<ConfigurationEntity>(message);
             this.dbContext.Entities.Add(entity);
 
             this.dbContext.SaveChanges();

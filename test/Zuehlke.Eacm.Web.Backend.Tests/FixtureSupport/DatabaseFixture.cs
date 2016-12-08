@@ -21,6 +21,8 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.FixtureSupport
                 cfg.AddProfile<ReadModelProfile>();
             });
 
+            config.AssertConfigurationIsValid();
+
             this.Mapper = new Mapper(config);
         }
 

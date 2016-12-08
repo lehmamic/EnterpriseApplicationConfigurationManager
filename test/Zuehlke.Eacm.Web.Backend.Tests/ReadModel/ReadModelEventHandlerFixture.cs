@@ -75,6 +75,41 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Description, project.Description);
         }
 
+        [Fact]
+        public void Handle_EntityDefinitionAddedEvent_CreatesEntity()
+        {
+            // arrange
+            var initialProject = this.context.DbContext.Projects.First();
+
+            var message = new EntityDefinitionAdded
+            {
+                Id = initialProject.Id,
+                EntityId = Guid.NewGuid(),
+                Version = 1,
+                TimeStamp = DateTimeOffset.Now,
+                Name = "New Entity Name",
+                Description = "new Entity Description"
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
+            Assert.Equal(message.Id, project.Id);
+            Assert.Equal(message.Version, project.Version);
+            Assert.Equal(message.TimeStamp, project.TimeStamp);
+
+            var entity = this.context.DbContext.Entities.FirstOrDefault(p => p.Id == message.EntityId);
+            Assert.NotNull(entity);
+            Assert.Equal(message.EntityId, entity.Id);
+            Assert.Equal(message.Id, entity.ProjectId);
+            Assert.Equal(message.Name, entity.Name);
+            Assert.Equal(message.Description, entity.Description);
+        }
+
         private void InitializeBasicReadModel()
         {
             var project = new ConfigurationProject
