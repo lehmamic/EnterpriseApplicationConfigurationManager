@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Zuehlke.Eacm.Web.Backend.DataAccess
 {
-    public class ConfigurationProject
+    public class ConfigurationEntity
     {
         [Key]
         public Guid Id { get; set; }
-
-        [Required]
-        public DateTimeOffset TimeStamp { get; set; }
-
-        [Required]
-        public int Version { get; set; }
 
         [Required]
         [MaxLength(200)]
@@ -22,6 +16,9 @@ namespace Zuehlke.Eacm.Web.Backend.DataAccess
         [MaxLength(4000)]
         public string Description { get; set; }
 
-        public ICollection<ConfigurationEntity> Entities { get; set; }
+        public Guid ProjectId { get; set; }
+
+        [ForeignKey("ProjectId")]
+        public ConfigurationProject Project { get; set; }
     }
 }
