@@ -52,6 +52,11 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         public void Handle(EntityDefinitionAdded message)
         {
             message.ArgumentNotNull(nameof(message));
+
+            var entity = mapper.Map<ConfigurationEntity>(message);
+            this.dbContext.Entities.Add(entity);
+
+            this.dbContext.SaveChanges();
         }
 
         public void Handle(EntityDefinitionModified message)

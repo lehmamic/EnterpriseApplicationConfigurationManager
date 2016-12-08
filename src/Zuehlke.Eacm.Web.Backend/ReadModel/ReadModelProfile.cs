@@ -10,6 +10,8 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         {
             this.CreateMap<ProjectCreated, ConfigurationProject>();
             this.CreateMap<ProjectModified, ConfigurationProject>();
+
+            this.CreateMap<EntityDefinitionAdded, ConfigurationEntity>();
         }
     }
 }
