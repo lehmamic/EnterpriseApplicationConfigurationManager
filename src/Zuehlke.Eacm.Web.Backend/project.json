@@ -2,6 +2,7 @@
   "dependencies": {
     "AutoMapper": "5.2.0",
     "CqrsLite": "0.11.8",
+    "Scrutor": "1.10.0",
     "Microsoft.AspNetCore.Mvc": "1.0.0",
     "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.0",

@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
 
   "testRunner": "xunit",
@@ -10,7 +10,7 @@
     "Microsoft.EntityFrameworkCore.InMemory": "1.0.0",
     "Moq": "4.6.38-alpha",
     "Zuehlke.Eacm.Web.Backend": "1.0.0-*",
-    "Microsoft.AspNetCore.TestHost": "1.0.0"
+    "Microsoft.AspNetCore.TestHost": "1.0.0",
   },
 
   "frameworks": {

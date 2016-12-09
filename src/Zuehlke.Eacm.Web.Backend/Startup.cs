@@ -1,10 +1,24 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using CQRSlite.Bus;
+using CQRSlite.Cache;
+using CQRSlite.Commands;
+using CQRSlite.Config;
+using CQRSlite.Domain;
+using CQRSlite.Events;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
 using Microsoft.EntityFrameworkCore;
+using Zuehlke.Eacm.Web.Backend.Commands;
+using Scrutor;
+using System.Reflection;
+using System.Linq;
+using AutoMapper;
+using Zuehlke.Eacm.Web.Backend.ReadModel;
+using Zuehlke.Eacm.Web.Backend.Utils.DependencyInjection;
+using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
 namespace Zuehlke.Eacm.Web.Backend
 {
@@ -26,6 +40,43 @@ namespace Zuehlke.Eacm.Web.Backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
+
+            // Add Cqrs services
+            services.AddSingleton<InProcessBus>(new InProcessBus());
+            services.AddSingleton<ICommandSender>(y => y.GetService<InProcessBus>());
+            services.AddSingleton<IEventPublisher>(y => y.GetService<InProcessBus>());
+            services.AddSingleton<IHandlerRegistrar>(y => y.GetService<InProcessBus>());
+            services.AddScoped<ISession, Session>();
+            services.AddSingleton<IEventStore, EventStore>();
+            services.AddScoped<ICache, MemoryCache>();
+            services.AddScoped<IRepository>(y => new CacheRepository(new Repository(y.GetService<IEventStore>()), y.GetService<IEventStore>(), y.GetService<ICache>()));
+
+            // Scan for commandhandlers and eventhandlers
+            services.Scan(scan => scan.FromAssemblies(typeof(ProjectCommandHandler).GetTypeInfo().Assembly)
+                    .AddClasses(classes => classes.Where(x => {
+                        var allInterfaces = x.GetInterfaces();
+                        return
+                            allInterfaces.Any(y => y.GetTypeInfo().IsGenericType && y.GetTypeInfo().GetGenericTypeDefinition() == typeof(ICommandHandler<>)) ||
+                            allInterfaces.Any(y => y.GetTypeInfo().IsGenericType && y.GetTypeInfo().GetGenericTypeDefinition() == typeof(IEventHandler<>));
+                    }))
+                    .AsSelf()
+                    .WithTransientLifetime()
+            );
+
+            // Register bus
+            var serviceProvider = services.BuildServiceProvider();
+            var registrar = new BusRegistrar(new DependencyResolver(serviceProvider));
+            registrar.Register(typeof(ProjectCommandHandler));
+
+            // Register auto mapper
+            var config = new MapperConfiguration(cfg => {
+                cfg.AddProfile<ReadModelProfile>();
+            });
+
+            services.AddSingleton<IConfigurationProvider>(config);
+            services.AddSingleton<IMapper, Mapper>();
+
             services.AddDbContext<EacmDbContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")));
 
             // Add framework services.

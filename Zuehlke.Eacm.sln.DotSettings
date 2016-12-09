@@ -1,0 +1,6 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=8D70FD58E50B1E438CAFCB2B69B98A9D/AbsolutePath/@EntryValue">C:\Data\Zühlke\EnterpriseApplicationConfigurationManager\Zuehlke.Eacm.DotSettings</s:String>
+	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=8D70FD58E50B1E438CAFCB2B69B98A9D/RelativePath/@EntryValue">..\Zuehlke.Eacm.DotSettings</s:String>
+	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=8D70FD58E50B1E438CAFCB2B69B98A9D/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File8D70FD58E50B1E438CAFCB2B69B98A9D/@KeyIndexDefined">True</s:Boolean>
+	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File8D70FD58E50B1E438CAFCB2B69B98A9D/RelativePriority/@EntryValue">1</s:Double></wpf:ResourceDictionary>
