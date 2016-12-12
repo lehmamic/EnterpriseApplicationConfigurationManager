@@ -18,7 +18,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             this.context = context.ArgumentNotNull(nameof(context));
         }
 
-        //[Fact]
+        [Fact]
         public async void CreateProject_WithValidProjectName_CreatesProject()
         {
             // arrange
@@ -28,7 +28,8 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             };
 
             // act
-            var response = await this.context.Client.PostAsync("api/projects", new StringContent(createProjectDto.ToJson(), Encoding.UTF8, "application/json"));
+            var content = createProjectDto.ToJson();
+            var response = await this.context.Client.PostAsync("api/projects", new StringContent(content, Encoding.UTF8, "application/json"));
 
             // assert
             Assert.True(response.IsSuccessStatusCode);

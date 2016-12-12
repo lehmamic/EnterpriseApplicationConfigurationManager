@@ -16,8 +16,10 @@ using Scrutor;
 using System.Reflection;
 using System.Linq;
 using AutoMapper;
+using Zuehlke.Eacm.Web.Backend.Models;
 using Zuehlke.Eacm.Web.Backend.ReadModel;
 using Zuehlke.Eacm.Web.Backend.Utils.DependencyInjection;
+using Zuehlke.Eacm.Web.Backend.Utils.Serialization;
 using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
 namespace Zuehlke.Eacm.Web.Backend
@@ -42,7 +44,18 @@ namespace Zuehlke.Eacm.Web.Backend
         {
             services.AddMemoryCache();
 
+            // Register auto mapper
+            var config = new MapperConfiguration(cfg => {
+                cfg.AddProfile<ReadModelProfile>();
+                cfg.AddProfile<ModelProfile>();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            services.AddSingleton<IMapper>(new Mapper(config));
+
             // Add Cqrs services
+            services.AddSingleton<ITextSerializer, JsonTextSerializer>();
             services.AddSingleton<InProcessBus>(new InProcessBus());
             services.AddSingleton<ICommandSender>(y => y.GetService<InProcessBus>());
             services.AddSingleton<IEventPublisher>(y => y.GetService<InProcessBus>());
@@ -68,14 +81,6 @@ namespace Zuehlke.Eacm.Web.Backend
             var serviceProvider = services.BuildServiceProvider();
             var registrar = new BusRegistrar(new DependencyResolver(serviceProvider));
             registrar.Register(typeof(ProjectCommandHandler));
-
-            // Register auto mapper
-            var config = new MapperConfiguration(cfg => {
-                cfg.AddProfile<ReadModelProfile>();
-            });
-
-            services.AddSingleton<IConfigurationProvider>(config);
-            services.AddSingleton<IMapper, Mapper>();
 
             services.AddDbContext<EacmDbContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")));
 
