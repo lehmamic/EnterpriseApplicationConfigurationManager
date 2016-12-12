@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Zuehlke.Eacm.Web.Backend.DataAccess
 {
-    public class ConfigurationEntity
+    public class ConfigurationProperty
     {
         [Key]
         public Guid Id { get; set; }
@@ -17,13 +16,13 @@ namespace Zuehlke.Eacm.Web.Backend.DataAccess
         [MaxLength(4000)]
         public string Description { get; set; }
 
-        public Guid ProjectId { get; set; }
+        [Required]
+        [MaxLength(200)]
+        public string PropertyType { get; set; }
 
-        [ForeignKey("ProjectId")]
-        public ConfigurationProject Project { get; set; }
+        public Guid EntityId { get; set; }
 
-        public ICollection<ConfigurationProperty> Properties { get; set; }
-
-        public ICollection<ConfigurationEntry> Entries { get; set; }
+        [ForeignKey("EntityId")]
+        public ConfigurationEntity Entity { get; set; }
     }
 }
