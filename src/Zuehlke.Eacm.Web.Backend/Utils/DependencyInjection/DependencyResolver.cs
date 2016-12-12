@@ -17,7 +17,7 @@ namespace Zuehlke.Eacm.Web.Backend.Utils.DependencyInjection
 
         public T GetService<T>()
         {
-            return (T)GetService(typeof(T));
+            return (T) this.GetService(typeof(T));
         }
 
         public object GetService(Type serviceType)

@@ -31,7 +31,7 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateProject(CreateProjectCommand command)
+        public IActionResult CreateProject([FromBody]CreateProjectCommand command)
         {
             if (!this.ModelState.IsValid)
             {
@@ -46,7 +46,7 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
             this.commandSender.Send(command);
 
             var project = this.dbContext.Projects.First(p => p.Id == command.Id);
-            return this.CreatedAtRoute("GetProject", this.mapper.Map<ProjectDto>(project));
+            return this.CreatedAtRoute("GetProject", new {  project.Id }, this.mapper.Map<ProjectDto>(project));
         }
     }
 }
