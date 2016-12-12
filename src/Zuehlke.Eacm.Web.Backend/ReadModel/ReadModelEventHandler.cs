@@ -78,6 +78,14 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         public void Handle(EntityDefinitionDeleted message)
         {
             message.ArgumentNotNull(nameof(message));
+
+            var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
+            this.mapper.Map(message, project);
+
+            var entity = this.dbContext.Entities.First(p => p.Id == message.EntityId);
+            this.dbContext.Entities.Remove(entity);
+
+            this.dbContext.SaveChanges();
         }
 
         public void Handle(PropertyDefinitionAdded message)
