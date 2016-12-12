@@ -91,6 +91,14 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         public void Handle(PropertyDefinitionAdded message)
         {
             message.ArgumentNotNull(nameof(message));
+
+            var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
+            this.mapper.Map(message, project);
+
+            var property = this.mapper.Map<ConfigurationProperty>(message);
+            this.dbContext.Properties.Add(property);
+
+            this.dbContext.SaveChanges();
         }
 
         public void Handle(PropertyDefinitionModified message)
