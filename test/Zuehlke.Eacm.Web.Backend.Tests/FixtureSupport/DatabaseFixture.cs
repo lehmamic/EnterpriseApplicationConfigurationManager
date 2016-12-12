@@ -2,7 +2,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
-using Zuehlke.Eacm.Web.Backend.ReadModel;
+using Zuehlke.Eacm.Web.Backend.Utils.Mapper;
 
 namespace Zuehlke.Eacm.Web.Backend.Tests.FixtureSupport
 {
@@ -17,10 +17,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.FixtureSupport
 
             this.DbContext = new EacmDbContext(builder.Options);
 
-            var config = new MapperConfiguration(cfg => {
-                cfg.AddProfile<ReadModelProfile>();
-            });
-
+            var config = new MapperConfiguration(MapperConfigurationExtensions.AddProfiles);
             config.AssertConfigurationIsValid();
 
             this.Mapper = new Mapper(config);

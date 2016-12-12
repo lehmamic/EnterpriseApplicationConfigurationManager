@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
 using System.Text;
-using NuGet.Protocol.Core.v3;
+using Newtonsoft.Json;
 using Xunit;
 using Zuehlke.Eacm.Web.Backend.Commands;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
@@ -28,13 +28,12 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             };
 
             // act
-            var content = createProjectDto.ToJson();
-            var response = await this.context.Client.PostAsync("api/projects", new StringContent(content, Encoding.UTF8, "application/json"));
+            var response = await this.context.Client.PostAsJsonAsync("api/projects", createProjectDto);
 
             // assert
             Assert.True(response.IsSuccessStatusCode);
 
-            var projectDto = (await response.Content.ReadAsStringAsync()).FromJson<ProjectDto>();
+            var projectDto = await response.ReadAsAsync<ProjectDto>();
             Assert.Equal(createProjectDto.Name, projectDto.Name);
         }
     }
