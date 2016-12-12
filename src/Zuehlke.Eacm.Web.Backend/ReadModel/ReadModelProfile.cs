@@ -18,7 +18,9 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
             this.CreateMap<EntityDefinitionAdded, ConfigurationEntity>()
                 .ForMember(p => p.Id, opt => opt.MapFrom(src => src.EntityId))
                 .ForMember(p => p.ProjectId, opt => opt.MapFrom(src => src.Id))
-                .ForMember(p => p.Project, opt => opt.Ignore());
+                .ForMember(p => p.Project, opt => opt.Ignore())
+                .ForMember(p => p.Properties, opt => opt.Ignore())
+                .ForMember(p => p.Entries, opt => opt.Ignore());
 
             this.CreateMap<EntityDefinitionAdded, ConfigurationProject>()
                 .ForMember(p => p.Id, opt => opt.Ignore())
@@ -29,7 +31,9 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
             this.CreateMap<EntityDefinitionModified, ConfigurationEntity>()
                 .ForMember(p => p.Id, opt => opt.Ignore())
                 .ForMember(p => p.ProjectId, opt => opt.Ignore())
-                .ForMember(p => p.Project, opt => opt.Ignore());
+                .ForMember(p => p.Project, opt => opt.Ignore())
+                .ForMember(p => p.Properties, opt => opt.Ignore())
+                .ForMember(p => p.Entries, opt => opt.Ignore());
 
             this.CreateMap<EntityDefinitionModified, ConfigurationProject>()
                 .ForMember(p => p.Id, opt => opt.Ignore())

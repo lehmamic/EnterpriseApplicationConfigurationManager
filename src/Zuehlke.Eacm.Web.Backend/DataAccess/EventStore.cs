@@ -34,6 +34,7 @@ namespace Zuehlke.Eacm.Web.Backend.DataAccess
                     AggregateType = typeof(T).Name,
                     Timestamp = e.TimeStamp,
                     Version = e.Version,
+                    User = "DummyUser",
                     Payload = this.Serialize(e)
                 };
 

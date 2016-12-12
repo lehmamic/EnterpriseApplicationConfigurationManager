@@ -21,6 +21,10 @@ namespace Zuehlke.Eacm.Web.Backend.DataAccess
         public int Version { get; set; }
 
         [Required]
+        [MaxLength(200)]
+        public string User { get; set; }
+
+        [Required]
         public string Payload { get; set; }
 
         public string CorrelationId { get; set; }
