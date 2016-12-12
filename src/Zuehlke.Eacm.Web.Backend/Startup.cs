@@ -16,11 +16,9 @@ using Scrutor;
 using System.Reflection;
 using System.Linq;
 using AutoMapper;
-using Zuehlke.Eacm.Web.Backend.Models;
-using Zuehlke.Eacm.Web.Backend.ReadModel;
 using Zuehlke.Eacm.Web.Backend.Utils.DependencyInjection;
+using Zuehlke.Eacm.Web.Backend.Utils.Mapper;
 using Zuehlke.Eacm.Web.Backend.Utils.Serialization;
-using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
 namespace Zuehlke.Eacm.Web.Backend
 {
@@ -45,11 +43,7 @@ namespace Zuehlke.Eacm.Web.Backend
             services.AddMemoryCache();
 
             // Register auto mapper
-            var config = new MapperConfiguration(cfg => {
-                cfg.AddProfile<ReadModelProfile>();
-                cfg.AddProfile<ModelProfile>();
-            });
-
+            var config = new MapperConfiguration(MapperConfigurationExtensions.AddProfiles);
             config.AssertConfigurationIsValid();
 
             services.AddSingleton<IMapper>(new Mapper(config));
