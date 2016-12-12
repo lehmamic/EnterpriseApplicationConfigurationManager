@@ -146,6 +146,36 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Description, entity.Description);
         }
 
+        [Fact]
+        public void Handle_EntityDefinitionDeletedEvent_RemovesEntity()
+        {
+            // arrange
+            var initialProject = this.context.DbContext.Projects.First();
+            var initialEntity = this.context.DbContext.Entities.Last();
+
+            var message = new EntityDefinitionDeleted
+            {
+                Id = initialProject.Id,
+                EntityId = initialEntity.Id,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
+            Assert.Equal(message.Id, project.Id);
+            Assert.Equal(message.Version, project.Version);
+            Assert.Equal(message.TimeStamp, project.TimeStamp);
+
+            var entity = this.context.DbContext.Entities.FirstOrDefault(p => p.Id == message.EntityId);
+            Assert.Null(entity);
+        }
+
         private void InitializeBasicReadModel()
         {
             var project = new ConfigurationProject
@@ -156,16 +186,25 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
                 Name = "Initial project name"
             };
 
-            var entity = new ConfigurationEntity
+            var entity1 = new ConfigurationEntity
             {
                 Id = Guid.NewGuid(),
-                Name = "Initial entity name",
+                Name = "Initial entity name 1",
+                Description = "Initial entity description",
+                ProjectId = project.Id
+            };
+
+            var entity2 = new ConfigurationEntity
+            {
+                Id = Guid.NewGuid(),
+                Name = "Initial entity name 2",
                 Description = "Initial entity description",
                 ProjectId = project.Id
             };
 
             this.context.DbContext.Projects.Add(project);
-            this.context.DbContext.Entities.Add(entity);
+            this.context.DbContext.Entities.Add(entity1);
+            this.context.DbContext.Entities.Add(entity2);
 
             this.context.DbContext.SaveChanges();
         }
