@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Zuehlke.Eacm.Web.Backend.DataAccess
 {
-    public class ConfigurationValue
+    public class ConfigurationValue : IDataModel
     {
         [Key]
         public Guid Id { get; set; }

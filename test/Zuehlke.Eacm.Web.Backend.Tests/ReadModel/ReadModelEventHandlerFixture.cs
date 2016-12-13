@@ -212,6 +212,42 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Description, property.Description);
         }
 
+        [Fact]
+        public void Handle_PropertyDefinitionModifiedEvent_CreatesProperty()
+        {
+            // arrange
+            var initialProject = this.context.DbContext.Projects.First();
+            var initialProperty = this.context.DbContext.Properties.Last();
+
+            var message = new PropertyDefinitionModified
+            {
+                Id = initialProject.Id,
+                PropertyId = initialProperty.Id,
+                Name = "New property name",
+                Description = "New property description",
+                PropertyType = "Zuehlke.Eacm.String",
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
+            Assert.Equal(message.Id, project.Id);
+            Assert.Equal(message.Version, project.Version);
+            Assert.Equal(message.TimeStamp, project.TimeStamp);
+
+            var property = this.context.DbContext.Properties.FirstOrDefault(p => p.Id == message.PropertyId);
+            Assert.NotNull(property);
+            Assert.Equal(message.Name, property.Name);
+            Assert.Equal(message.Description, property.Description);
+            Assert.Equal(message.PropertyType, property.PropertyType);
+        }
+
         private void InitializeBasicReadModel()
         {
             var project = new ConfigurationProject
@@ -238,9 +274,27 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
                 ProjectId = project.Id
             };
 
+            var property1 = new ConfigurationProperty
+            {
+                Id = Guid.NewGuid(),
+                Name = "TestProperty",
+                PropertyType = "Zuehlke.Eacm.Integer",
+                EntityId = entity1.Id
+            };
+
+            var property2 = new ConfigurationProperty
+            {
+                Id = Guid.NewGuid(),
+                Name = "TestPropertyToDelete",
+                PropertyType = "Zuehlke.Eacm.Integer",
+                EntityId = entity1.Id
+            };
+
             this.context.DbContext.Projects.Add(project);
             this.context.DbContext.Entities.Add(entity1);
             this.context.DbContext.Entities.Add(entity2);
+            this.context.DbContext.Properties.Add(property1);
+            this.context.DbContext.Properties.Add(property2);
 
             this.context.DbContext.SaveChanges();
         }

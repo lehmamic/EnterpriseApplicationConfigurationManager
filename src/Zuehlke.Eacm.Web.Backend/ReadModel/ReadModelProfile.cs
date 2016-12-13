@@ -57,6 +57,17 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
                 .ForMember(p => p.Name, opt => opt.Ignore())
                 .ForMember(p => p.Description, opt => opt.Ignore())
                 .ForMember(p => p.Entities, opt => opt.Ignore());
+
+            this.CreateMap<PropertyDefinitionModified, ConfigurationProperty>()
+                .ForMember(p => p.Id, opt => opt.MapFrom(src => src.PropertyId))
+                .ForMember(p => p.Entity, opt => opt.Ignore())
+                .ForMember(p => p.EntityId, opt => opt.Ignore());
+
+            this.CreateMap<PropertyDefinitionModified, ConfigurationProject>()
+                .ForMember(p => p.Id, opt => opt.Ignore())
+                .ForMember(p => p.Name, opt => opt.Ignore())
+                .ForMember(p => p.Description, opt => opt.Ignore())
+                .ForMember(p => p.Entities, opt => opt.Ignore());
         }
     }
 }

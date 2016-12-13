@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AutoMapper;
 using CQRSlite.Events;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
@@ -104,6 +105,10 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         public void Handle(PropertyDefinitionModified message)
         {
             message.ArgumentNotNull(nameof(message));
+
+            this.UpdateEntity<PropertyDefinitionModified, ConfigurationProperty>(message, m => m.PropertyId);
+
+            this.dbContext.SaveChanges();
         }
 
         public void Handle(PropertyDefinitionDeleted message)
@@ -124,6 +129,18 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         public void Handle(ConfigurationEntryDeleted message)
         {
             message.ArgumentNotNull(nameof(message));
+        }
+
+        private void UpdateEntity<TEvent, TEntity>(TEvent message, Func<TEvent, Guid> entityIdSelector)
+            where TEvent : IEvent
+            where TEntity : class, IDataModel
+        {
+            var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
+            this.mapper.Map(message, project);
+
+            Guid entityId = entityIdSelector(message);
+            TEntity entity = this.dbContext.Set<TEntity>().Single(p => p.Id == entityId);
+            this.mapper.Map(message, entity);
         }
     }
 }
