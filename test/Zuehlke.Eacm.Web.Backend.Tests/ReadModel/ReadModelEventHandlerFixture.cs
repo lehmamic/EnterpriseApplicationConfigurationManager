@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
@@ -276,6 +277,44 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
 
             var property = this.context.DbContext.Properties.FirstOrDefault(p => p.Id == message.PropertyId);
             Assert.Null(property);
+        }
+
+        [Fact]
+        public void Handle_ConfigurationEntryAddedEvent_CreatesEntry()
+        {
+            // arrange
+            var initialProject = this.context.DbContext.Projects.First();
+            var initialEntity= this.context.DbContext.Entities.First();
+            var initialProperty = this.context.DbContext.Properties.First();
+
+            var message = new ConfigurationEntryAdded
+            {
+                Id = initialProject.Id,
+                EntryId = Guid.NewGuid(),
+                EntityId = initialEntity.Id,
+                Values = new Dictionary<Guid, object> {{ initialProperty.Id, "TestValue" }},
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
+            Assert.Equal(message.Id, project.Id);
+            Assert.Equal(message.Version, project.Version);
+            Assert.Equal(message.TimeStamp, project.TimeStamp);
+
+            var entry = this.context.DbContext.Entries.FirstOrDefault(p => p.Id == message.EntryId);
+            Assert.NotNull(entry);
+
+            var value = this.context.DbContext.Values.FirstOrDefault(p => p.EntryId == message.EntryId);
+            Assert.NotNull(value);
+            Assert.Equal(initialProperty.Id, value.PropertyId);
+            Assert.Equal("TestValue", value.Value);
         }
 
         private void InitializeBasicReadModel()

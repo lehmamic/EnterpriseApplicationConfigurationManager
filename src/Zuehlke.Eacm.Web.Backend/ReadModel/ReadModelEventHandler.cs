@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using CQRSlite.Events;
@@ -99,16 +100,34 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         public void Handle(ConfigurationEntryAdded message)
         {
             message.ArgumentNotNull(nameof(message));
+
+            this.UpdateProject(message);
+
+            var entry = this.mapper.Map<ConfigurationEntry>(message);
+            this.dbContext.Entries.Add(entry);
+
+            var values = this.mapper.Map<IEnumerable<ConfigurationValue>>(message);
+            this.dbContext.Values.AddRange(values);
+
+            this.dbContext.SaveChanges();
         }
 
         public void Handle(ConfigurationEntryModified message)
         {
             message.ArgumentNotNull(nameof(message));
+
+            this.UpdateProject(message);
+
+            this.dbContext.SaveChanges();
         }
 
         public void Handle(ConfigurationEntryDeleted message)
         {
             message.ArgumentNotNull(nameof(message));
+
+            this.UpdateProject(message);
+
+            this.dbContext.SaveChanges();
         }
 
         private void AddEntity<TEvent, TEntity>(TEvent message)
