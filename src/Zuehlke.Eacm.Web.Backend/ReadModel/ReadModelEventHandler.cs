@@ -44,9 +44,7 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
-            this.mapper.Map(message, project);
-
+            this.UpdateProject(message);
             this.dbContext.SaveChanges();
         }
 
@@ -54,12 +52,7 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
-            this.mapper.Map(message, project);
-
-            var entity = this.mapper.Map<ConfigurationEntity>(message);
-            this.dbContext.Entities.Add(entity);
-
+            this.AddEntity<EntityDefinitionAdded, ConfigurationEntity>(message);
             this.dbContext.SaveChanges();
         }
 
@@ -67,12 +60,7 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
-            this.mapper.Map(message, project);
-
-            var entity = this.dbContext.Entities.Single(p => p.Id == message.EntityId);
-            this.mapper.Map(message, entity);
-
+            this.UpdateEntity<EntityDefinitionModified, ConfigurationEntity>(message, m => m.EntityId);
             this.dbContext.SaveChanges();
         }
 
@@ -80,21 +68,13 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
-            this.mapper.Map(message, project);
-
-            var entity = this.dbContext.Entities.First(p => p.Id == message.EntityId);
-            this.dbContext.Entities.Remove(entity);
-
+            this.DeleteEntity<EntityDefinitionDeleted, ConfigurationEntity>(message, m => m.EntityId);
             this.dbContext.SaveChanges();
         }
 
         public void Handle(PropertyDefinitionAdded message)
         {
             message.ArgumentNotNull(nameof(message));
-
-            var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
-            this.mapper.Map(message, project);
 
             this.AddEntity<PropertyDefinitionAdded, ConfigurationProperty>(message);
             this.dbContext.SaveChanges();
