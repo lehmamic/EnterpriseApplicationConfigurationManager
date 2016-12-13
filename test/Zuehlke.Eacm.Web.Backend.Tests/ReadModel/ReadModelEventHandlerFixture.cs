@@ -181,7 +181,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         {
             // arrange
             var initialProject = this.context.DbContext.Projects.First();
-            var initialEntity = this.context.DbContext.Entities.Last();
+            var initialEntity = this.context.DbContext.Entities.First();
 
             var message = new PropertyDefinitionAdded
             {
@@ -217,7 +217,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         {
             // arrange
             var initialProject = this.context.DbContext.Projects.First();
-            var initialProperty = this.context.DbContext.Properties.Last();
+            var initialProperty = this.context.DbContext.Properties.First();
 
             var message = new PropertyDefinitionModified
             {
@@ -246,6 +246,36 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Name, property.Name);
             Assert.Equal(message.Description, property.Description);
             Assert.Equal(message.PropertyType, property.PropertyType);
+        }
+
+        [Fact]
+        public void Handle_PropertyDefinitionDeletedEvent_CreatesProperty()
+        {
+            // arrange
+            var initialProject = this.context.DbContext.Projects.First();
+            var initialProperty = this.context.DbContext.Properties.Last();
+
+            var message = new PropertyDefinitionDeleted
+            {
+                Id = initialProject.Id,
+                PropertyId = initialProperty.Id,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
+            Assert.Equal(message.Id, project.Id);
+            Assert.Equal(message.Version, project.Version);
+            Assert.Equal(message.TimeStamp, project.TimeStamp);
+
+            var property = this.context.DbContext.Properties.FirstOrDefault(p => p.Id == message.PropertyId);
+            Assert.Null(property);
         }
 
         private void InitializeBasicReadModel()

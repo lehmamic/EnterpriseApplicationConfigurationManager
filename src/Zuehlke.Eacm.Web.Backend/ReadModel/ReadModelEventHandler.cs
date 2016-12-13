@@ -96,9 +96,7 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
             var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
             this.mapper.Map(message, project);
 
-            var property = this.mapper.Map<ConfigurationProperty>(message);
-            this.dbContext.Properties.Add(property);
-
+            this.AddEntity<PropertyDefinitionAdded, ConfigurationProperty>(message);
             this.dbContext.SaveChanges();
         }
 
@@ -107,13 +105,15 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
             message.ArgumentNotNull(nameof(message));
 
             this.UpdateEntity<PropertyDefinitionModified, ConfigurationProperty>(message, m => m.PropertyId);
-
             this.dbContext.SaveChanges();
         }
 
         public void Handle(PropertyDefinitionDeleted message)
         {
             message.ArgumentNotNull(nameof(message));
+
+            this.DeleteEntity<PropertyDefinitionDeleted, ConfigurationProperty>(message, m => m.PropertyId);
+            this.dbContext.SaveChanges();
         }
 
         public void Handle(ConfigurationEntryAdded message)
@@ -131,16 +131,44 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
             message.ArgumentNotNull(nameof(message));
         }
 
+        private void AddEntity<TEvent, TEntity>(TEvent message)
+            where TEvent : IEvent
+            where TEntity : class, IDataModel
+        {
+            this.UpdateProject(message);
+
+            var entity = this.mapper.Map<TEntity>(message);
+            this.dbContext.Set<TEntity>().Add(entity);
+        }
+
         private void UpdateEntity<TEvent, TEntity>(TEvent message, Func<TEvent, Guid> entityIdSelector)
             where TEvent : IEvent
             where TEntity : class, IDataModel
         {
-            var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
-            this.mapper.Map(message, project);
+            this.UpdateProject(message);
 
             Guid entityId = entityIdSelector(message);
+
             TEntity entity = this.dbContext.Set<TEntity>().Single(p => p.Id == entityId);
             this.mapper.Map(message, entity);
+        }
+
+        private void DeleteEntity<TEvent, TEntity>(TEvent message, Func<TEvent, Guid> entityIdSelector)
+            where TEvent : IEvent
+            where TEntity : class, IDataModel
+        {
+            this.UpdateProject(message);
+
+            Guid entityId = entityIdSelector(message);
+
+            TEntity entity = this.dbContext.Set<TEntity>().Single(p => p.Id == entityId);
+            this.dbContext.Set<TEntity>().Remove(entity);
+        }
+
+        private void UpdateProject<TEvent>(TEvent message) where TEvent : IEvent
+        {
+            var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
+            this.mapper.Map(message, project);
         }
     }
 }
