@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Zuehlke.Eacm.Web.Backend.DataAccess
 {
-    public class Event
+    public class Event : IDataModel
     {
         [Key]
         public Guid Id { get; set; }
