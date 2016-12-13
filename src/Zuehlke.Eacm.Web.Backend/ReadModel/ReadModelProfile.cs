@@ -1,5 +1,9 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
+using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.DomainModel.Events;
 
 namespace Zuehlke.Eacm.Web.Backend.ReadModel
@@ -82,6 +86,33 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
                 .ForMember(p => p.Name, opt => opt.Ignore())
                 .ForMember(p => p.Description, opt => opt.Ignore())
                 .ForMember(p => p.Entities, opt => opt.Ignore());
+
+            this.CreateMap<ConfigurationEntryAdded, ConfigurationEntry>()
+                .ForMember(p => p.Id, opt => opt.MapFrom(src => src.EntryId))
+                .ForMember(p => p.Entity, opt => opt.Ignore())
+                .ForMember(p => p.Values, opt => opt.Ignore());
+
+            this.CreateMap<ConfigurationEntryAdded, ConfigurationProject>()
+                .ForMember(p => p.Id, opt => opt.Ignore())
+                .ForMember(p => p.Name, opt => opt.Ignore())
+                .ForMember(p => p.Description, opt => opt.Ignore())
+                .ForMember(p => p.Entities, opt => opt.Ignore());
+
+            this.CreateMap<ConfigurationEntryAdded, IEnumerable<ConfigurationValue>>()
+                .ConvertUsing(ConvertEntryAddedToValues);
+        }
+
+        private static IEnumerable<ConfigurationValue> ConvertEntryAddedToValues(ConfigurationEntryAdded message)
+        {
+            message.ArgumentNotNull(nameof(message));
+
+            return message.Values.Select(v => new ConfigurationValue
+            {
+                Id = Guid.NewGuid(),
+                EntryId = message.EntryId,
+                PropertyId = v.Key,
+                Value = v.Value?.ToString()
+            });
         }
     }
 }
