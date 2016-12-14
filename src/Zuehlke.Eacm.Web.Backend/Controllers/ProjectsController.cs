@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using CQRSlite.Commands;
@@ -27,7 +28,21 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
         [HttpGet("{id}", Name = "GetProject")]
         public IActionResult GetProject(Guid id)
         {
-            return this.Ok();
+            var project = this.dbContext.Projects.FirstOrDefault(p => p.Id == id);
+            if (project == null)
+            {
+                return this.NotFound();
+            }
+
+            return this.Ok(this.mapper.Map<ProjectDto>(project));
+        }
+
+        [HttpGet]
+        public IActionResult GetProjects()
+        {
+            var projects = this.dbContext.Projects.AsEnumerable();
+
+            return this.Ok(this.mapper.Map<IEnumerable<ProjectDto>>(projects));
         }
 
         [HttpPost]
