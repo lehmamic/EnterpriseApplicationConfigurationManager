@@ -1,6 +1,7 @@
-﻿using System.Net.Http;
-using System.Text;
-using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Xunit;
 using Zuehlke.Eacm.Web.Backend.Commands;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
@@ -35,6 +36,52 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
 
             var projectDto = await response.ReadAsAsync<ProjectDto>();
             Assert.Equal(createProjectDto.Name, projectDto.Name);
+        }
+
+        [Fact]
+        public async void GetProject_WithValidProjectId_ReturnsProject()
+        {
+            // arrange
+            var expectedProject = await this.PrepareProject();
+
+            // act
+            HttpResponseMessage response = await this.context.Client.GetAsync($"api/projects/{expectedProject.Id}");
+
+            // assert
+            Assert.True(response.IsSuccessStatusCode);
+
+            var actualProject = await response.ReadAsAsync<ProjectDto>();
+            Assert.Equal(expectedProject.Id, actualProject.Id);
+            Assert.Equal(expectedProject.Name, actualProject.Name);
+        }
+
+        [Fact]
+        public async void GetProject_WithoutQueryOptions_ReturnsProjects()
+        {
+            // arrange
+            var expectedProject1 = await this.PrepareProject();
+            var expectedProject2 = await this.PrepareProject();
+
+            // act
+            HttpResponseMessage response = await this.context.Client.GetAsync($"api/projects");
+
+            // assert
+            Assert.True(response.IsSuccessStatusCode);
+
+            var actualProjects = (await response.ReadAsAsync<IEnumerable<ProjectDto>>()).ToArray();
+            Assert.Contains(actualProjects, p => p.Id == expectedProject1.Id);
+            Assert.Contains(actualProjects, p => p.Id == expectedProject2.Id);
+        }
+
+        private async Task<ProjectDto> PrepareProject()
+        {
+            var createProjectDto = new CreateProjectCommand
+            {
+                Name = "My Fancy project"
+            };
+            var response = await this.context.Client.PostAsJsonAsync("api/projects", createProjectDto);
+            var projectDto = await response.ReadAsAsync<ProjectDto>();
+            return projectDto;
         }
     }
 }
