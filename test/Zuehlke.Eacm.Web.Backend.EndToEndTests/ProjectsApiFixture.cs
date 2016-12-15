@@ -63,7 +63,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             var expectedProject2 = await this.PrepareProject();
 
             // act
-            HttpResponseMessage response = await this.context.Client.GetAsync($"api/projects");
+            HttpResponseMessage response = await this.context.Client.GetAsync("api/projects");
 
             // assert
             Assert.True(response.IsSuccessStatusCode);
@@ -71,6 +71,29 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             var actualProjects = (await response.ReadAsAsync<IEnumerable<ProjectDto>>()).ToArray();
             Assert.Contains(actualProjects, p => p.Id == expectedProject1.Id);
             Assert.Contains(actualProjects, p => p.Id == expectedProject2.Id);
+        }
+
+        // [Fact]
+        public async void UpdateProject_WithValidProjectNameAndDescription_UpdatesProjects()
+        {
+            // arrange
+            var existingProject = await this.PrepareProject();
+
+            var value = new ProjectDto
+            {
+                Name = "Modifed Project Name",
+                Description = "Modified Project Description"
+            };
+
+            // act
+            HttpResponseMessage response = await this.context.Client.PutAsJsonAsync($"api/projects/{existingProject.Id}", value);
+
+            // assert
+            Assert.True(response.IsSuccessStatusCode);
+
+            var actualProject = await this.context.Client.ReadAsAsync<ProjectDto>($"api/projects/{existingProject.Id}");
+            Assert.Equal(actualProject.Name, value.Name);
+            Assert.Equal(actualProject.Description, value.Description);
         }
 
         private async Task<ProjectDto> PrepareProject()

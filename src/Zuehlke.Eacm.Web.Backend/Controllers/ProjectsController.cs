@@ -63,5 +63,19 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
             var project = this.dbContext.Projects.First(p => p.Id == command.Id);
             return this.CreatedAtRoute("GetProject", new {  project.Id }, this.mapper.Map<ProjectDto>(project));
         }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateProject(Guid id, [FromBody] ProjectDto project)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.BadRequest(this.ModelState);
+            }
+
+            var command = this.mapper.Map<ModifyProjectAttributesCommand>(project, o => o.AfterMap((src, dest) => ((ModifyProjectAttributesCommand) dest).Id = project.Id));
+            this.commandSender.Send(command);
+
+            return this.Ok();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Zuehlke.Eacm.Web.Backend.Commands;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
 
 namespace Zuehlke.Eacm.Web.Backend.Models
@@ -8,6 +9,8 @@ namespace Zuehlke.Eacm.Web.Backend.Models
         public ModelProfile()
         {
             this.CreateMap<ConfigurationProject, ProjectDto>();
+            this.CreateMap<ProjectDto, ModifyProjectAttributesCommand>()
+                .ForMember(dest => dest.ExpectedVersion, opt => opt.Ignore());
         }
     }
 }
