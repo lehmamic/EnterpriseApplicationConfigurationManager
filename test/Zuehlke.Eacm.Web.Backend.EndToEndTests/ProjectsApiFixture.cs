@@ -73,7 +73,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             Assert.Contains(actualProjects, p => p.Id == expectedProject2.Id);
         }
 
-        // [Fact]
+        [Fact]
         public async void UpdateProject_WithValidProjectNameAndDescription_UpdatesProjects()
         {
             // arrange

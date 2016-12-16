@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using CQRSlite.Commands;
+using CQRSlite.Domain.Exception;
 using Microsoft.AspNetCore.Mvc;
 using Zuehlke.Eacm.Web.Backend.Commands;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
@@ -72,8 +73,28 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
                 return this.BadRequest(this.ModelState);
             }
 
-            var command = this.mapper.Map<ModifyProjectAttributesCommand>(project, o => o.AfterMap((src, dest) => ((ModifyProjectAttributesCommand) dest).Id = project.Id));
-            this.commandSender.Send(command);
+            var projectReadModel = this.dbContext.Projects.SingleOrDefault(p => p.Id == id);
+            if (projectReadModel == null)
+            {
+                return this.NotFound();
+            }
+
+            var command = this.mapper.Map<ModifyProjectAttributesCommand>(project, o => o.AfterMap((src, dest) =>
+            {
+                var c = (ModifyProjectAttributesCommand) dest;
+                c.Id = id;
+                c.ExpectedVersion = projectReadModel.Version;
+            }));
+
+            try
+            {
+                this.commandSender.Send(command);
+            }
+            catch (ConcurrencyException)
+            {
+                // TODO: Introduce a general concept for this (e.g. action filters)
+                return this.BadRequest();
+            }
 
             return this.Ok();
         }
