@@ -101,6 +101,12 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
             this.CreateMap<ConfigurationEntryAdded, IEnumerable<ConfigurationValue>>()
                 .ConvertUsing(ConvertEntryAddedToValues);
 
+            this.CreateMap<ConfigurationEntryModified, ConfigurationProject>()
+                .ForMember(p => p.Id, opt => opt.Ignore())
+                .ForMember(p => p.Name, opt => opt.Ignore())
+                .ForMember(p => p.Description, opt => opt.Ignore())
+                .ForMember(p => p.Entities, opt => opt.Ignore());
+
             this.CreateMap<ConfigurationEntryModified, IEnumerable<ConfigurationValue>>()
                 .ConvertUsing(ConvertEntryModifiedToValues);
         }

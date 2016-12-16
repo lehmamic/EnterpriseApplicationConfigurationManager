@@ -118,9 +118,6 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
 
             this.UpdateProject(message);
 
-            ConfigurationEntry entry = this.dbContext.Entries.Single(p => p.Id == message.EntryId);
-            this.mapper.Map(message, entry);
-
             IQueryable<ConfigurationValue> oldValues = this.dbContext.Values.Where(p => p.EntryId == message.EntryId);
             this.dbContext.Values.RemoveRange(oldValues);
 
