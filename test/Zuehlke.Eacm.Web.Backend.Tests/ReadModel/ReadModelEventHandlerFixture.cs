@@ -529,6 +529,31 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
+        public void Handle_PropertyDefinitionDeletedEvent_DeletesValues()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialProperty = initialProject.Entities.First().Properties.First();
+
+            var message = new PropertyDefinitionDeleted
+            {
+                Id = initialProject.Id,
+                PropertyId = initialProperty.Id,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var values = this.context.DbContext.Values.Where(v => v.PropertyId == initialProperty.Id);
+            Assert.Empty(values);
+        }
+
+        [Fact]
         public void Handle_ConfigurationEntryAddedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
