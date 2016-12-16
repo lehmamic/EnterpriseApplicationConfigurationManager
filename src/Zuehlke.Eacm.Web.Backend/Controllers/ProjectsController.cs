@@ -58,12 +58,12 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
             var command = this.mapper.Map<CreateProjectCommand>(project);
             this.commandSender.Send(command);
 
-            var projectEntity = this.dbContext.Projects.First(p => p.Id == command.Id);
-            return this.CreatedAtRoute("GetProject", new { projectEntity.Id }, this.mapper.Map<ProjectDto>(projectEntity));
+            var projectReadModel = this.dbContext.Projects.First(p => p.Id == command.Id);
+            return this.CreatedAtRoute("GetProject", new { projectReadModel.Id }, this.mapper.Map<ProjectDto>(projectReadModel));
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateProject(Guid id, [FromBody] ProjectDto project)
+        public IActionResult UpdateProject(Guid id, [FromBody]ProjectDto project)
         {
             if (!this.ModelState.IsValid)
             {
@@ -82,6 +82,40 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
             return this.NoContent();
         }
 
+        [HttpGet("{projectId}/entities/{id}", Name = "GetEntity")]
+        public IActionResult CreateEntity(Guid projectId, Guid id)
+        {
+            var entity = this.dbContext.Entities.FirstOrDefault(p => p.Id == id && projectId == projectId);
+            if (entity == null)
+            {
+                return this.NotFound();
+            }
 
+            return this.Ok(this.mapper.Map<EntityDto>(entity));
+        }
+
+        [HttpPost("{projectId}/entities")]
+        public IActionResult CreateEntity(Guid projectId, [FromBody]EntityDto entity)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.BadRequest(this.ModelState);
+            }
+
+            var currentproject = this.dbContext.Projects.SingleOrDefault(p => p.Id == projectId);
+            if (currentproject == null)
+            {
+                return this.NotFound();
+            }
+
+            var command = this.mapper.Map<CreateEntityCommand>(entity, projectId, currentproject.Version);
+            this.commandSender.Send(command);
+
+            var entityReadModel = this.dbContext.Entities.First(p => p.Name == entity.Name);
+            return this.CreatedAtRoute(
+                "GetEntity",
+                new { ProjectId = projectId, entityReadModel.Id },
+                this.mapper.Map<EntityDto>(entityReadModel));
+        }
     }
 }

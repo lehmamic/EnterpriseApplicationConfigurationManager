@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -36,6 +37,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
 
             var projectDto = await response.ReadAsAsync<ProjectDto>();
             Assert.Equal(createProjectDto.Name, projectDto.Name);
+            Assert.Null(projectDto.Description);
         }
 
         [Fact]
@@ -56,7 +58,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void GetProject_WithoutQueryOptions_ReturnsProjects()
+        public async void GetProjects_WithoutQueryOptions_ReturnsProjects()
         {
             // arrange
             var expectedProject1 = await this.PrepareProject();
@@ -86,7 +88,8 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             };
 
             // act
-            HttpResponseMessage response = await this.context.Client.PutAsJsonAsync($"api/projects/{existingProject.Id}", value);
+            HttpResponseMessage response =
+                await this.context.Client.PutAsJsonAsync($"api/projects/{existingProject.Id}", value);
 
             // assert
             Assert.True(response.IsSuccessStatusCode);
@@ -96,15 +99,69 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             Assert.Equal(actualProject.Description, value.Description);
         }
 
+        [Fact]
+        public async void CreateEntity_WithValidEntityNameAndDescription_CreatesEntity()
+        {
+            // arrange
+            var existingProject = await this.PrepareProject();
+
+            var value = new EntityDto
+            {
+                Name = "New Entity Name",
+                Description = "New Entity Description"
+            };
+
+            // act
+            HttpResponseMessage response =
+                await this.context.Client.PostAsJsonAsync($"api/projects/{existingProject.Id}/entities", value);
+
+            // arrange
+            Assert.True(response.IsSuccessStatusCode);
+
+            var entityDto = await response.ReadAsAsync<EntityDto>();
+            Assert.Equal(entityDto.Name, entityDto.Name);
+            Assert.Equal(entityDto.Description, entityDto.Description);
+        }
+
+        [Fact]
+        public async void GetEntity_WithValidProjectAndEntityId_ReturnsEntity()
+        {
+            // arrange
+            var existingProject = await this.PrepareProject();
+            var existingEntity = await this.PrepareEntity(existingProject.Id);
+
+            // act
+            HttpResponseMessage response = await this.context.Client.GetAsync($"api/projects/{existingProject.Id}/entities/{existingEntity.Id}");
+
+            // arrange
+            Assert.True(response.IsSuccessStatusCode);
+
+            var entityDto = await response.ReadAsAsync<EntityDto>();
+            Assert.Equal(entityDto.Name, entityDto.Name);
+            Assert.Equal(entityDto.Description, entityDto.Description);
+        }
+
         private async Task<ProjectDto> PrepareProject()
         {
-            var createProjectDto = new CreateProjectCommand
+            var createProjectDto = new ProjectDto
             {
                 Name = "My Fancy project"
             };
+
             var response = await this.context.Client.PostAsJsonAsync("api/projects", createProjectDto);
-            var projectDto = await response.ReadAsAsync<ProjectDto>();
-            return projectDto;
+            return await response.ReadAsAsync<ProjectDto>();
+        }
+
+        private async Task<EntityDto> PrepareEntity(Guid projectId)
+        {
+            var createEntityDto = new EntityDto
+            {
+                Name = "My Fancy Entity",
+                Description = "Any Description"
+            };
+
+            var response = await this.context.Client.PostAsJsonAsync($"api/projects/{projectId}/entities", createEntityDto);
+            return await response.ReadAsAsync<EntityDto>();
         }
     }
 }
