@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using CQRSlite.Commands;
-using CQRSlite.Domain.Exception;
 using Microsoft.AspNetCore.Mvc;
 using Zuehlke.Eacm.Web.Backend.Commands;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
@@ -110,13 +109,13 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
                 return this.BadRequest(this.ModelState);
             }
 
-            var currentproject = this.dbContext.Projects.SingleOrDefault(p => p.Id == projectId);
-            if (currentproject == null)
+            var currentProject = this.dbContext.Projects.SingleOrDefault(p => p.Id == projectId);
+            if (currentProject == null)
             {
                 return this.NotFound();
             }
 
-            var command = this.mapper.Map<CreateEntityCommand>(entity, projectId, currentproject.Version);
+            var command = this.mapper.Map<CreateEntityCommand>(entity, projectId, currentProject.Version);
             this.commandSender.Send(command);
 
             var entityReadModel = this.dbContext.Entities.First(p => p.Name == entity.Name);
@@ -124,6 +123,53 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
                 "GetEntity",
                 new { ProjectId = projectId, entityReadModel.Id },
                 this.mapper.Map<EntityDto>(entityReadModel));
+        }
+
+        [HttpPut("{projectId}/entities/{id}")]
+        public IActionResult UpdateEntity(Guid projectId, Guid id, [FromBody]EntityDto entity)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.BadRequest(this.ModelState);
+            }
+
+            var currentProject = this.dbContext.Projects.SingleOrDefault(p => p.Id == projectId);
+            if (currentProject == null)
+            {
+                return this.NotFound();
+            }
+
+            entity.Id = id;
+            var command = this.mapper.Map<ModifyEntityCommand>(entity, projectId, currentProject.Version);
+            this.commandSender.Send(command);
+
+            return this.NoContent();
+        }
+
+        [HttpDelete("{projectId}/entities/{id}")]
+        public IActionResult DeleteEntity(Guid projectId, Guid id)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.BadRequest(this.ModelState);
+            }
+
+            var currentProject = this.dbContext.Projects.SingleOrDefault(p => p.Id == projectId);
+            if (currentProject == null)
+            {
+                return this.NoContent();
+            }
+
+            var command = new DeleteEntityCommand
+            {
+                Id = projectId,
+                ExpectedVersion = currentProject.Version,
+                EntityId = id
+            };
+
+            this.commandSender.Send(command);
+
+            return this.NoContent();
         }
     }
 }
