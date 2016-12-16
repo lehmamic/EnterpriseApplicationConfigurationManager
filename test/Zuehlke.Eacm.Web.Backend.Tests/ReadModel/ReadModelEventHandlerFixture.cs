@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Xunit;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
@@ -317,6 +318,45 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal("TestValue", value.Value);
         }
 
+        [Fact]
+        public void Handle_ConfigurationEntryModifiedEvent_CreatesEntry()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+            var initialEntry = initialEntity.Entries.First();
+
+            var message = new ConfigurationEntryModified
+            {
+                Id = initialProject.Id,
+                EntryId = initialEntry.Id,
+                Values = new Dictionary<Guid, object>
+                {
+                    { initialEntity.Properties.ElementAt(0).Id, "TestValue1" },
+                    { initialEntity.Properties.ElementAt(1).Id, "TestValue2" }
+                },
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
+            Assert.Equal(message.Id, project.Id);
+            Assert.Equal(message.Version, project.Version);
+            Assert.Equal(message.TimeStamp, project.TimeStamp);
+
+            var values = this.context.DbContext.Values.Where(p => p.EntryId == message.EntryId);
+
+            Assert.Equal(2, values.Count());
+            Assert.Contains(values, v => v.Value == "TestValue1");
+            Assert.Contains(values, v => v.Value == "TestValue2");
+        }
+
         private void InitializeBasicReadModel()
         {
             var project = new ConfigurationProject
@@ -359,13 +399,104 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
                 EntityId = entity1.Id
             };
 
+            var entry1 = new ConfigurationEntry
+            {
+                Id = Guid.NewGuid(),
+                EntityId = entity1.Id
+            };
+
+            var entry2 = new ConfigurationEntry
+            {
+                Id = Guid.NewGuid(),
+                EntityId = entity1.Id
+            };
+
             this.context.DbContext.Projects.Add(project);
             this.context.DbContext.Entities.Add(entity1);
             this.context.DbContext.Entities.Add(entity2);
             this.context.DbContext.Properties.Add(property1);
             this.context.DbContext.Properties.Add(property2);
+            this.context.DbContext.Entries.Add(entry1);
+            this.context.DbContext.Entries.Add(entry2);
 
             this.context.DbContext.SaveChanges();
+        }
+
+        private ConfigurationProject CreateProject()
+        {
+            var project = new ConfigurationProject
+            {
+                Id = Guid.NewGuid(),
+                Version = 1,
+                TimeStamp = DateTimeOffset.Now.AddDays(-1),
+                Name = "Initial project name"
+            };
+
+            var entity = new ConfigurationEntity
+            {
+                Id = Guid.NewGuid(),
+                Name = "Initial entity name 1",
+                Description = "Initial entity description",
+                ProjectId = project.Id
+            };
+
+            project.Entities = new Collection<ConfigurationEntity>{entity };
+
+            entity.Properties = new Collection<ConfigurationProperty>
+            {
+                new ConfigurationProperty
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "TestProperty",
+                    PropertyType = "Zuehlke.Eacm.Integer",
+                    EntityId = entity.Id
+                },
+                new ConfigurationProperty
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "TestPropertyToDelete",
+                    PropertyType = "Zuehlke.Eacm.Integer",
+                    EntityId = entity.Id
+                }
+            };
+
+            entity.Entries = new Collection<ConfigurationEntry>
+            {
+                new ConfigurationEntry
+                {
+                    Id = Guid.NewGuid(),
+                    EntityId = entity.Id
+                }
+            };
+
+            var entry = entity.Entries.First();
+            entry.Values = new Collection<ConfigurationValue>
+            {
+                new ConfigurationValue
+                {
+                    Id = Guid.NewGuid(),
+                    EntryId = entry.Id,
+                    PropertyId = entity.Properties.ElementAt(0).Id,
+                    Value = "First Value"
+                },
+                new ConfigurationValue
+                {
+                    Id = Guid.NewGuid(),
+                    EntryId = entry.Id,
+                    PropertyId = entity.Properties.ElementAt(1).Id,
+                    Value = "First Value"
+                }
+            };
+
+            this.context.DbContext.Projects.Add(project);
+            this.context.DbContext.Entities.Add(entity);
+            this.context.DbContext.Properties.AddRange(entity.Properties);
+            this.context.DbContext.Entries.Add(entry);
+            this.context.DbContext.Values.AddRange(entry.Values);
+
+            this.context.DbContext.SaveChanges();
+
+            return project;
         }
     }
 }
