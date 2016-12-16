@@ -78,6 +78,17 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
             message.ArgumentNotNull(nameof(message));
 
             this.AddEntity<PropertyDefinitionAdded, ConfigurationProperty>(message);
+
+            var entries = this.dbContext.Entries.Where(e => e.EntityId == message.ParentEntityId);
+            var newPropertyValues = entries.Select(entry => new ConfigurationValue
+            {
+                Id = Guid.NewGuid(),
+                EntryId = entry.Id,
+                PropertyId = message.PropertyId
+            });
+
+            this.dbContext.Values.AddRange(newPropertyValues);
+
             this.dbContext.SaveChanges();
         }
 
