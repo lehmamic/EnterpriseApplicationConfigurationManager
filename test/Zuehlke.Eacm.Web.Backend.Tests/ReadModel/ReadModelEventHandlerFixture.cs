@@ -355,6 +355,69 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Contains(values, v => v.Value == "TestValue2");
         }
 
+        [Fact]
+        public void Handle_ConfigurationEntryDeletedEvent_DeletesEntry()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+            var initialEntry = initialEntity.Entries.First();
+
+            var message = new ConfigurationEntryDeleted
+            {
+                Id = initialProject.Id,
+                EntryId = initialEntry.Id,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
+            Assert.Equal(message.Id, project.Id);
+            Assert.Equal(message.Version, project.Version);
+            Assert.Equal(message.TimeStamp, project.TimeStamp);
+
+            var entry = this.context.DbContext.Entries.FirstOrDefault(e => e.Id == initialEntry.Id);
+
+            Assert.Null(entry);
+        }
+
+        [Fact]
+        public void Handle_ConfigurationEntryDeletedEvent_DeletesValues()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+            var initialEntry = initialEntity.Entries.First();
+
+            var message = new ConfigurationEntryDeleted
+            {
+                Id = initialProject.Id,
+                EntryId = initialEntry.Id,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
+            Assert.Equal(message.Id, project.Id);
+            Assert.Equal(message.Version, project.Version);
+            Assert.Equal(message.TimeStamp, project.TimeStamp);
+
+            var values = this.context.DbContext.Values.Where(e => e.EntryId == initialEntry.Id);
+            Assert.Empty(values);
+        }
+
         private ConfigurationProject CreateProject()
         {
             var project = new ConfigurationProject
