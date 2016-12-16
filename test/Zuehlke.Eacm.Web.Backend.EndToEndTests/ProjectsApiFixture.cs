@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
@@ -158,6 +159,49 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             var actualEntities = (await response.ReadAsAsync<IEnumerable<EntityDto>>()).ToArray();
             Assert.Contains(actualEntities, p => p.Id == existingEntity1.Id);
             Assert.Contains(actualEntities, p => p.Id == existingEntity2.Id);
+        }
+
+        [Fact]
+        public async void UpdateEntity_WithValidEntityNameAndDescription_UpdatesEntity()
+        {
+            // arrange
+            var existingProject = await this.PrepareProject();
+            var existingEntity = await this.PrepareEntity(existingProject.Id);
+
+            var value = new EntityDto
+            {
+                Name = "New Entity Name",
+                Description = "New Entity Description"
+            };
+
+            // act
+            HttpResponseMessage response =
+                await this.context.Client.PutAsJsonAsync($"api/projects/{existingProject.Id}/entities/{existingEntity.Id}", value);
+
+            // arrange
+            Assert.True(response.IsSuccessStatusCode);
+
+            var actualEntity = await this.context.Client.ReadAsAsync<EntityDto>($"api/projects/{existingProject.Id}/entities/{existingEntity.Id}");
+            Assert.Equal(actualEntity.Name, value.Name);
+            Assert.Equal(actualEntity.Description, value.Description);
+        }
+
+        [Fact]
+        public async void DeleteEntity_WithValidEntityAndProjectId_RemovesEntity()
+        {
+            // arrange
+            var existingProject = await this.PrepareProject();
+            var existingEntity = await this.PrepareEntity(existingProject.Id);
+
+            // act
+            HttpResponseMessage deleteResponse =
+                await this.context.Client.DeleteAsync($"api/projects/{existingProject.Id}/entities/{existingEntity.Id}");
+
+            // arrange
+            Assert.True(deleteResponse.IsSuccessStatusCode);
+
+            var readResponse = await this.context.Client.GetAsync($"api/projects/{existingProject.Id}/entities/{existingEntity.Id}");
+            Assert.Equal(HttpStatusCode.NotFound, readResponse.StatusCode);
         }
 
         private async Task<ProjectDto> PrepareProject()
