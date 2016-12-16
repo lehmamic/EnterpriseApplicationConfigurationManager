@@ -9,6 +9,7 @@ using Zuehlke.Eacm.Web.Backend.Commands;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.Models;
+using Zuehlke.Eacm.Web.Backend.Utils.Mapper;
 
 namespace Zuehlke.Eacm.Web.Backend.Controllers
 {
@@ -79,11 +80,10 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
                 return this.NotFound();
             }
 
-            var command = this.mapper.Map<ModifyProjectAttributesCommand>(project, o => o.AfterMap((src, dest) =>
+            var command = this.mapper.Map<ModifyProjectAttributesCommand>(project, o => o.AfterMap<ProjectDto, ModifyProjectAttributesCommand>((src, dest) =>
             {
-                var c = (ModifyProjectAttributesCommand) dest;
-                c.Id = id;
-                c.ExpectedVersion = projectReadModel.Version;
+                dest.Id = id;
+                dest.ExpectedVersion = projectReadModel.Version;
             }));
 
             try
