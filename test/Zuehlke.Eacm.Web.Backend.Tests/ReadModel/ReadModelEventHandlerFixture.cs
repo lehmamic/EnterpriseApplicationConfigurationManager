@@ -47,7 +47,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_ProjectModifiedEvent_CreatesProject()
+        public void Handle_ProjectModifiedEvent_UpdatesProject()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -76,7 +76,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_EntityDefinitionAddedEvent_CreatesEntity()
+        public void Handle_EntityDefinitionAddedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -101,7 +101,30 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Id, project.Id);
             Assert.Equal(message.Version, project.Version);
             Assert.Equal(message.TimeStamp, project.TimeStamp);
+        }
 
+        [Fact]
+        public void Handle_EntityDefinitionAddedEvent_CreatesEntity()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+
+            var message = new EntityDefinitionAdded
+            {
+                Id = initialProject.Id,
+                EntityId = Guid.NewGuid(),
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now,
+                Name = "New Entity Name",
+                Description = "new Entity Description"
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
             var entity = this.context.DbContext.Entities.FirstOrDefault(p => p.Id == message.EntityId);
             Assert.NotNull(entity);
             Assert.Equal(message.EntityId, entity.Id);
@@ -111,7 +134,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_EntityDefinitionModifiedEvent_CreatesEntity()
+        public void Handle_EntityDefinitionModifiedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -137,7 +160,31 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Id, project.Id);
             Assert.Equal(message.Version, project.Version);
             Assert.Equal(message.TimeStamp, project.TimeStamp);
+        }
 
+        [Fact]
+        public void Handle_EntityDefinitionModifiedEvent_UpdatesEntity()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+
+            var message = new EntityDefinitionModified
+            {
+                Id = initialProject.Id,
+                EntityId = initialEntity.Id,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now,
+                Name = "New Entity Name",
+                Description = "new Entity Description"
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
             var entity = this.context.DbContext.Entities.FirstOrDefault(p => p.Id == message.EntityId);
             Assert.NotNull(entity);
             Assert.Equal(message.EntityId, entity.Id);
@@ -147,7 +194,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_EntityDefinitionDeletedEvent_RemovesEntity()
+        public void Handle_EntityDefinitionDeletedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -171,13 +218,111 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Id, project.Id);
             Assert.Equal(message.Version, project.Version);
             Assert.Equal(message.TimeStamp, project.TimeStamp);
+        }
 
+        [Fact]
+        public void Handle_EntityDefinitionDeletedEvent_RemovesEntity()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+
+            var message = new EntityDefinitionDeleted
+            {
+                Id = initialProject.Id,
+                EntityId = initialEntity.Id,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
             var entity = this.context.DbContext.Entities.FirstOrDefault(p => p.Id == message.EntityId);
             Assert.Null(entity);
         }
 
         [Fact]
-        public void Handle_PropertyDefinitionAddedEvent_CreatesProperty()
+        public void Handle_EntityDefinitionDeletedEvent_RemovesPropertiesOfEntity()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+
+            var message = new EntityDefinitionDeleted
+            {
+                Id = initialProject.Id,
+                EntityId = initialEntity.Id,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var properties = this.context.DbContext.Properties.Where(p => p.EntityId == message.EntityId);
+            Assert.Empty(properties);
+        }
+
+        [Fact]
+        public void Handle_EntityDefinitionDeletedEvent_RemovesEntriesOfEntity()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+
+            var message = new EntityDefinitionDeleted
+            {
+                Id = initialProject.Id,
+                EntityId = initialEntity.Id,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var entries = this.context.DbContext.Entries.Where(p => p.EntityId == message.EntityId);
+            Assert.Empty(entries);
+        }
+
+        [Fact]
+        public void Handle_EntityDefinitionDeletedEvent_RemovesValuesOfEntity()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+            var initialEntry = initialEntity.Entries.First();
+
+            var message = new EntityDefinitionDeleted
+            {
+                Id = initialProject.Id,
+                EntityId = initialEntity.Id,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var values = this.context.DbContext.Values.Where(p => p.EntryId == initialEntry.Id);
+            Assert.Empty(values);
+        }
+
+        [Fact]
+        public void Handle_PropertyDefinitionAddedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -204,7 +349,64 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Id, project.Id);
             Assert.Equal(message.Version, project.Version);
             Assert.Equal(message.TimeStamp, project.TimeStamp);
+        }
 
+        [Fact]
+        public void Handle_PropertyDefinitionAddedEvent_CreatesProperty()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+
+            var message = new PropertyDefinitionAdded
+            {
+                Id = initialProject.Id,
+                ParentEntityId = initialEntity.Id,
+                PropertyId = Guid.NewGuid(),
+                Name = "New property name",
+                Description = "New property description",
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
+            var property = this.context.DbContext.Properties.FirstOrDefault(p => p.Id == message.PropertyId);
+            Assert.NotNull(property);
+            Assert.Equal(message.ParentEntityId, property.EntityId);
+            Assert.Equal(message.Name, property.Name);
+            Assert.Equal(message.Description, property.Description);
+        }
+
+        //[Fact]
+        public void Handle_PropertyDefinitionAddedEvent_AddsValueToEntry()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+            var initialEntry = initialEntity.Entries.First();
+
+            var message = new PropertyDefinitionAdded
+            {
+                Id = initialProject.Id,
+                ParentEntityId = initialEntity.Id,
+                PropertyId = Guid.NewGuid(),
+                Name = "New property name",
+                Description = "New property description",
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
             var property = this.context.DbContext.Properties.FirstOrDefault(p => p.Id == message.PropertyId);
             Assert.NotNull(property);
             Assert.Equal(message.ParentEntityId, property.EntityId);
@@ -213,7 +415,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_PropertyDefinitionModifiedEvent_CreatesProperty()
+        public void Handle_PropertyDefinitionModifiedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -240,7 +442,32 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Id, project.Id);
             Assert.Equal(message.Version, project.Version);
             Assert.Equal(message.TimeStamp, project.TimeStamp);
+        }
 
+        [Fact]
+        public void Handle_PropertyDefinitionModifiedEvent_UpdatesProperty()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialProperty = initialProject.Entities.First().Properties.First();
+
+            var message = new PropertyDefinitionModified
+            {
+                Id = initialProject.Id,
+                PropertyId = initialProperty.Id,
+                Name = "New property name",
+                Description = "New property description",
+                PropertyType = "Zuehlke.Eacm.String",
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
             var property = this.context.DbContext.Properties.FirstOrDefault(p => p.Id == message.PropertyId);
             Assert.NotNull(property);
             Assert.Equal(message.Name, property.Name);
@@ -249,7 +476,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_PropertyDefinitionDeletedEvent_CreatesProperty()
+        public void Handle_PropertyDefinitionDeletedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -273,13 +500,35 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Id, project.Id);
             Assert.Equal(message.Version, project.Version);
             Assert.Equal(message.TimeStamp, project.TimeStamp);
+        }
 
+        [Fact]
+        public void Handle_PropertyDefinitionDeletedEvent_DeletesProperty()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialProperty = initialProject.Entities.First().Properties.First();
+
+            var message = new PropertyDefinitionDeleted
+            {
+                Id = initialProject.Id,
+                PropertyId = initialProperty.Id,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
             var property = this.context.DbContext.Properties.FirstOrDefault(p => p.Id == message.PropertyId);
             Assert.Null(property);
         }
 
         [Fact]
-        public void Handle_ConfigurationEntryAddedEvent_CreatesEntry()
+        public void Handle_ConfigurationEntryAddedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -306,10 +555,60 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Id, project.Id);
             Assert.Equal(message.Version, project.Version);
             Assert.Equal(message.TimeStamp, project.TimeStamp);
+        }
 
+        [Fact]
+        public void Handle_ConfigurationEntryAddedEvent_CreatesEntry()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+            var initialProperty = initialEntity.Properties.First();
+
+            var message = new ConfigurationEntryAdded
+            {
+                Id = initialProject.Id,
+                EntryId = Guid.NewGuid(),
+                EntityId = initialEntity.Id,
+                Values = new Dictionary<Guid, object> {{ initialProperty.Id, "TestValue" }},
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
             var entry = this.context.DbContext.Entries.FirstOrDefault(p => p.Id == message.EntryId);
             Assert.NotNull(entry);
+        }
 
+        [Fact]
+        public void Handle_ConfigurationEntryAddedEvent_CreatesValues()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+            var initialProperty = initialEntity.Properties.First();
+
+            var message = new ConfigurationEntryAdded
+            {
+                Id = initialProject.Id,
+                EntryId = Guid.NewGuid(),
+                EntityId = initialEntity.Id,
+                Values = new Dictionary<Guid, object> {{ initialProperty.Id, "TestValue" }},
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
             var value = this.context.DbContext.Values.FirstOrDefault(p => p.EntryId == message.EntryId);
             Assert.NotNull(value);
             Assert.Equal(initialProperty.Id, value.PropertyId);
@@ -317,7 +616,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_ConfigurationEntryModifiedEvent_CreatesEntry()
+        public void Handle_ConfigurationEntryModifiedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -347,16 +646,43 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Id, project.Id);
             Assert.Equal(message.Version, project.Version);
             Assert.Equal(message.TimeStamp, project.TimeStamp);
+        }
 
+        [Fact]
+        public void Handle_ConfigurationEntryModifiedEvent_UpdatesValues()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+            var initialEntry = initialEntity.Entries.First();
+
+            var message = new ConfigurationEntryModified
+            {
+                Id = initialProject.Id,
+                EntryId = initialEntry.Id,
+                Values = new Dictionary<Guid, object>
+                {
+                    { initialEntity.Properties.ElementAt(0).Id, "TestValue1" },
+                    { initialEntity.Properties.ElementAt(1).Id, "TestValue2" }
+                },
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
             var values = this.context.DbContext.Values.Where(p => p.EntryId == message.EntryId);
-
             Assert.Equal(2, values.Count());
             Assert.Contains(values, v => v.Value == "TestValue1");
             Assert.Contains(values, v => v.Value == "TestValue2");
         }
 
         [Fact]
-        public void Handle_ConfigurationEntryDeletedEvent_DeletesEntry()
+        public void Handle_ConfigurationEntryDeletedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -381,9 +707,31 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Id, project.Id);
             Assert.Equal(message.Version, project.Version);
             Assert.Equal(message.TimeStamp, project.TimeStamp);
+        }
 
+        [Fact]
+        public void Handle_ConfigurationEntryDeletedEvent_DeletesEntry()
+        {
+            // arrange
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+            var initialEntry = initialEntity.Entries.First();
+
+            var message = new ConfigurationEntryDeleted
+            {
+                Id = initialProject.Id,
+                EntryId = initialEntry.Id,
+                Version = 2,
+                TimeStamp = DateTimeOffset.Now
+            };
+
+            var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
+
+            // act
+            target.Handle(message);
+
+            // assert
             var entry = this.context.DbContext.Entries.FirstOrDefault(e => e.Id == initialEntry.Id);
-
             Assert.Null(entry);
         }
 
@@ -409,11 +757,6 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             target.Handle(message);
 
             // assert
-            var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
-            Assert.Equal(message.Id, project.Id);
-            Assert.Equal(message.Version, project.Version);
-            Assert.Equal(message.TimeStamp, project.TimeStamp);
-
             var values = this.context.DbContext.Values.Where(e => e.EntryId == initialEntry.Id);
             Assert.Empty(values);
         }
