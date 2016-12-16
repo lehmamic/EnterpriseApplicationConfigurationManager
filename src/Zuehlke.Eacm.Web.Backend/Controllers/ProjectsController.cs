@@ -79,7 +79,9 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
             var command = this.mapper.Map<ModifyProjectCommand>(project, id, currentproject.Version);
             this.commandSender.Send(command);
 
-            return this.Ok();
+            return this.NoContent();
         }
+
+
     }
 }
