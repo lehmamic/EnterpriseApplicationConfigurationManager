@@ -18,8 +18,6 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         public ReadModelEventHandlerFixture(DatabaseFixture context)
         {
             this.context = context.ArgumentNotNull(nameof(context));
-
-            this.InitializeBasicReadModel();
         }
 
         [Fact]
@@ -52,7 +50,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         public void Handle_ProjectModifiedEvent_CreatesProject()
         {
             // arrange
-            var initialProject = this.context.DbContext.Projects.First();
+            var initialProject = this.CreateProject();
 
             var message = new ProjectModified
             {
@@ -81,7 +79,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         public void Handle_EntityDefinitionAddedEvent_CreatesEntity()
         {
             // arrange
-            var initialProject = this.context.DbContext.Projects.First();
+            var initialProject = this.CreateProject();
 
             var message = new EntityDefinitionAdded
             {
@@ -116,8 +114,8 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         public void Handle_EntityDefinitionModifiedEvent_CreatesEntity()
         {
             // arrange
-            var initialProject = this.context.DbContext.Projects.First();
-            var initialEntity = this.context.DbContext.Entities.First();
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
 
             var message = new EntityDefinitionModified
             {
@@ -152,8 +150,8 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         public void Handle_EntityDefinitionDeletedEvent_RemovesEntity()
         {
             // arrange
-            var initialProject = this.context.DbContext.Projects.First();
-            var initialEntity = this.context.DbContext.Entities.Last();
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
 
             var message = new EntityDefinitionDeleted
             {
@@ -182,8 +180,8 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         public void Handle_PropertyDefinitionAddedEvent_CreatesProperty()
         {
             // arrange
-            var initialProject = this.context.DbContext.Projects.First();
-            var initialEntity = this.context.DbContext.Entities.First();
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
 
             var message = new PropertyDefinitionAdded
             {
@@ -218,8 +216,8 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         public void Handle_PropertyDefinitionModifiedEvent_CreatesProperty()
         {
             // arrange
-            var initialProject = this.context.DbContext.Projects.First();
-            var initialProperty = this.context.DbContext.Properties.First();
+            var initialProject = this.CreateProject();
+            var initialProperty = initialProject.Entities.First().Properties.First();
 
             var message = new PropertyDefinitionModified
             {
@@ -254,8 +252,8 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         public void Handle_PropertyDefinitionDeletedEvent_CreatesProperty()
         {
             // arrange
-            var initialProject = this.context.DbContext.Projects.First();
-            var initialProperty = this.context.DbContext.Properties.Last();
+            var initialProject = this.CreateProject();
+            var initialProperty = initialProject.Entities.First().Properties.First();
 
             var message = new PropertyDefinitionDeleted
             {
@@ -284,9 +282,9 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         public void Handle_ConfigurationEntryAddedEvent_CreatesEntry()
         {
             // arrange
-            var initialProject = this.context.DbContext.Projects.First();
-            var initialEntity= this.context.DbContext.Entities.First();
-            var initialProperty = this.context.DbContext.Properties.First();
+            var initialProject = this.CreateProject();
+            var initialEntity = initialProject.Entities.First();
+            var initialProperty = initialEntity.Properties.First();
 
             var message = new ConfigurationEntryAdded
             {
@@ -355,71 +353,6 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(2, values.Count());
             Assert.Contains(values, v => v.Value == "TestValue1");
             Assert.Contains(values, v => v.Value == "TestValue2");
-        }
-
-        private void InitializeBasicReadModel()
-        {
-            var project = new ConfigurationProject
-            {
-                Id = Guid.NewGuid(),
-                Version = 1,
-                TimeStamp = DateTimeOffset.Now.AddDays(-1),
-                Name = "Initial project name"
-            };
-
-            var entity1 = new ConfigurationEntity
-            {
-                Id = Guid.NewGuid(),
-                Name = "Initial entity name 1",
-                Description = "Initial entity description",
-                ProjectId = project.Id
-            };
-
-            var entity2 = new ConfigurationEntity
-            {
-                Id = Guid.NewGuid(),
-                Name = "Initial entity name 2",
-                Description = "Initial entity description",
-                ProjectId = project.Id
-            };
-
-            var property1 = new ConfigurationProperty
-            {
-                Id = Guid.NewGuid(),
-                Name = "TestProperty",
-                PropertyType = "Zuehlke.Eacm.Integer",
-                EntityId = entity1.Id
-            };
-
-            var property2 = new ConfigurationProperty
-            {
-                Id = Guid.NewGuid(),
-                Name = "TestPropertyToDelete",
-                PropertyType = "Zuehlke.Eacm.Integer",
-                EntityId = entity1.Id
-            };
-
-            var entry1 = new ConfigurationEntry
-            {
-                Id = Guid.NewGuid(),
-                EntityId = entity1.Id
-            };
-
-            var entry2 = new ConfigurationEntry
-            {
-                Id = Guid.NewGuid(),
-                EntityId = entity1.Id
-            };
-
-            this.context.DbContext.Projects.Add(project);
-            this.context.DbContext.Entities.Add(entity1);
-            this.context.DbContext.Entities.Add(entity2);
-            this.context.DbContext.Properties.Add(property1);
-            this.context.DbContext.Properties.Add(property2);
-            this.context.DbContext.Entries.Add(entry1);
-            this.context.DbContext.Entries.Add(entry2);
-
-            this.context.DbContext.SaveChanges();
         }
 
         private ConfigurationProject CreateProject()
