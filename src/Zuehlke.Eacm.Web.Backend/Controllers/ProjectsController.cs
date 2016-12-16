@@ -83,15 +83,23 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
         }
 
         [HttpGet("{projectId}/entities/{id}", Name = "GetEntity")]
-        public IActionResult CreateEntity(Guid projectId, Guid id)
+        public IActionResult GetEntity(Guid projectId, Guid id)
         {
-            var entity = this.dbContext.Entities.FirstOrDefault(p => p.Id == id && projectId == projectId);
+            var entity = this.dbContext.Entities.FirstOrDefault(p => p.Id == id && p.ProjectId == projectId);
             if (entity == null)
             {
                 return this.NotFound();
             }
 
             return this.Ok(this.mapper.Map<EntityDto>(entity));
+        }
+
+        [HttpGet("{projectId}/entities")]
+        public IActionResult GetEntities(Guid projectId)
+        {
+            var entities = this.dbContext.Entities.Where(p => p.ProjectId == projectId);
+
+            return this.Ok(this.mapper.Map<IEnumerable<EntityDto>>(entities));
         }
 
         [HttpPost("{projectId}/entities")]

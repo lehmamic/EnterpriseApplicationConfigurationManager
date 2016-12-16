@@ -141,6 +141,25 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             Assert.Equal(entityDto.Description, entityDto.Description);
         }
 
+        [Fact]
+        public async void GetEntities_WithoutQueryOptions_ReturnsEntities()
+        {
+            // arrange
+            var existingProject = await this.PrepareProject();
+            var existingEntity1 = await this.PrepareEntity(existingProject.Id);
+            var existingEntity2 = await this.PrepareEntity(existingProject.Id);
+
+            // act
+            HttpResponseMessage response = await this.context.Client.GetAsync($"api/projects/{existingProject.Id}/entities");
+
+            // arrange
+            Assert.True(response.IsSuccessStatusCode);
+
+            var actualEntities = (await response.ReadAsAsync<IEnumerable<EntityDto>>()).ToArray();
+            Assert.Contains(actualEntities, p => p.Id == existingEntity1.Id);
+            Assert.Contains(actualEntities, p => p.Id == existingEntity2.Id);
+        }
+
         private async Task<ProjectDto> PrepareProject()
         {
             var createProjectDto = new ProjectDto
@@ -156,7 +175,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         {
             var createEntityDto = new EntityDto
             {
-                Name = "My Fancy Entity",
+                Name = $"My Fancy Entity {Guid.NewGuid()}",
                 Description = "Any Description"
             };
 
