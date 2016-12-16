@@ -48,22 +48,18 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateProject([FromBody]CreateProjectCommand command)
+        public IActionResult CreateProject([FromBody]ProjectDto project)
         {
             if (!this.ModelState.IsValid)
             {
                 return this.BadRequest(this.ModelState);
             }
 
-            if (command.Id == Guid.Empty)
-            {
-                command.Id = Guid.NewGuid();
-            }
-
+            var command = this.mapper.Map<CreateProjectCommand>(project);
             this.commandSender.Send(command);
 
-            var project = this.dbContext.Projects.First(p => p.Id == command.Id);
-            return this.CreatedAtRoute("GetProject", new { project.Id }, this.mapper.Map<ProjectDto>(project));
+            var projectEntity = this.dbContext.Projects.First(p => p.Id == command.Id);
+            return this.CreatedAtRoute("GetProject", new { projectEntity.Id }, this.mapper.Map<ProjectDto>(projectEntity));
         }
 
         [HttpPut("{id}")]
