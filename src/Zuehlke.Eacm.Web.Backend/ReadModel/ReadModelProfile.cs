@@ -100,9 +100,25 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
 
             this.CreateMap<ConfigurationEntryAdded, IEnumerable<ConfigurationValue>>()
                 .ConvertUsing(ConvertEntryAddedToValues);
+
+            this.CreateMap<ConfigurationEntryModified, IEnumerable<ConfigurationValue>>()
+                .ConvertUsing(ConvertEntryModifiedToValues);
         }
 
         private static IEnumerable<ConfigurationValue> ConvertEntryAddedToValues(ConfigurationEntryAdded message)
+        {
+            message.ArgumentNotNull(nameof(message));
+
+            return message.Values.Select(v => new ConfigurationValue
+            {
+                Id = Guid.NewGuid(),
+                EntryId = message.EntryId,
+                PropertyId = v.Key,
+                Value = v.Value?.ToString()
+            });
+        }
+
+        private static IEnumerable<ConfigurationValue> ConvertEntryModifiedToValues(ConfigurationEntryModified message)
         {
             message.ArgumentNotNull(nameof(message));
 
