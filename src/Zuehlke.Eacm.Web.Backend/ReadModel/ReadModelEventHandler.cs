@@ -118,6 +118,15 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
 
             this.UpdateProject(message);
 
+            ConfigurationEntry entry = this.dbContext.Entries.Single(p => p.Id == message.EntryId);
+            this.mapper.Map(message, entry);
+
+            IQueryable<ConfigurationValue> oldValues = this.dbContext.Values.Where(p => p.EntryId == message.EntryId);
+            this.dbContext.Values.RemoveRange(oldValues);
+
+            var newValues = this.mapper.Map<IEnumerable<ConfigurationValue>>(message);
+            this.dbContext.Values.AddRange(newValues);
+
             this.dbContext.SaveChanges();
         }
 
@@ -126,6 +135,9 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
             message.ArgumentNotNull(nameof(message));
 
             this.UpdateProject(message);
+
+            ConfigurationEntry entry = this.dbContext.Entries.Single(p => p.Id == message.EntryId);
+            this.dbContext.Entries.Remove(entry);
 
             this.dbContext.SaveChanges();
         }
