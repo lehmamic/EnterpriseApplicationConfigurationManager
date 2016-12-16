@@ -382,7 +382,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Description, property.Description);
         }
 
-        //[Fact]
+        [Fact]
         public void Handle_PropertyDefinitionAddedEvent_AddsValueToEntry()
         {
             // arrange
@@ -407,11 +407,12 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             target.Handle(message);
 
             // assert
-            var property = this.context.DbContext.Properties.FirstOrDefault(p => p.Id == message.PropertyId);
-            Assert.NotNull(property);
-            Assert.Equal(message.ParentEntityId, property.EntityId);
-            Assert.Equal(message.Name, property.Name);
-            Assert.Equal(message.Description, property.Description);
+            var values = this.context.DbContext.Values.Where(p => p.EntryId == initialEntry.Id);
+            Assert.Equal(3, values.Count());
+
+            var propertyValue = values.FirstOrDefault(v => v.PropertyId == message.PropertyId);
+            Assert.NotNull(propertyValue);
+            Assert.Equal(propertyValue.Value, null);
         }
 
         [Fact]
