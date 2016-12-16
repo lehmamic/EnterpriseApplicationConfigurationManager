@@ -7,7 +7,7 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
 {
     public class ProjectCommandHandler :
         ICommandHandler<CreateProjectCommand>,
-        ICommandHandler<ModifyProjectAttributesCommand>,
+        ICommandHandler<ModifyProjectCommand>,
         ICommandHandler<CreateEntityCommand>,
         ICommandHandler<ModifyEntityCommand>,
         ICommandHandler<DeleteEntityCommand>,
@@ -35,7 +35,7 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
             this.session.Commit();
         }
 
-        public void Handle(ModifyProjectAttributesCommand message)
+        public void Handle(ModifyProjectCommand message)
         {
             message.ArgumentNotNull(nameof(message));
 

@@ -9,7 +9,7 @@ namespace Zuehlke.Eacm.Web.Backend.Models
         public ModelProfile()
         {
             this.CreateMap<ConfigurationProject, ProjectDto>();
-            this.CreateMap<ProjectDto, ModifyProjectAttributesCommand>()
+            this.CreateMap<ProjectDto, ModifyProjectCommand>()
                 .ForMember(dest => dest.ExpectedVersion, opt => opt.Ignore());
         }
     }

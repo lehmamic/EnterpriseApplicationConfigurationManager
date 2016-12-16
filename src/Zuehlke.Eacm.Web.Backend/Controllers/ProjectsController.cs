@@ -63,7 +63,7 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
             this.commandSender.Send(command);
 
             var project = this.dbContext.Projects.First(p => p.Id == command.Id);
-            return this.CreatedAtRoute("GetProject", new {  project.Id }, this.mapper.Map<ProjectDto>(project));
+            return this.CreatedAtRoute("GetProject", new { project.Id }, this.mapper.Map<ProjectDto>(project));
         }
 
         [HttpPut("{id}")]
@@ -74,27 +74,14 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
                 return this.BadRequest(this.ModelState);
             }
 
-            var projectReadModel = this.dbContext.Projects.SingleOrDefault(p => p.Id == id);
-            if (projectReadModel == null)
+            var currentproject = this.dbContext.Projects.SingleOrDefault(p => p.Id == id);
+            if (currentproject == null)
             {
                 return this.NotFound();
             }
 
-            var command = this.mapper.Map<ModifyProjectAttributesCommand>(project, o => o.AfterMap<ProjectDto, ModifyProjectAttributesCommand>((src, dest) =>
-            {
-                dest.Id = id;
-                dest.ExpectedVersion = projectReadModel.Version;
-            }));
-
-            try
-            {
-                this.commandSender.Send(command);
-            }
-            catch (ConcurrencyException)
-            {
-                // TODO: Introduce a general concept for this (e.g. action filters)
-                return this.BadRequest();
-            }
+            var command = this.mapper.Map<ModifyProjectCommand>(project, id, currentproject.Version);
+            this.commandSender.Send(command);
 
             return this.Ok();
         }

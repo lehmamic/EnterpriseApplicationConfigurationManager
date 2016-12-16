@@ -33,7 +33,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.Commands
             // arrange
             var project = CreateProject();
 
-            var command = new ModifyProjectAttributesCommand
+            var command = new ModifyProjectCommand
             {
                 Id = project.Id,
                 Name = "NewProjectName",

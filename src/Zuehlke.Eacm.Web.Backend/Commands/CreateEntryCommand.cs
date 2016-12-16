@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using CQRSlite.Commands;
 
 namespace Zuehlke.Eacm.Web.Backend.Commands
 {
-    public class CreateEntryCommand : ICommand
+    public class CreateEntryCommand : IDomainCommand
     {
         public Guid Id { get; set; }
 

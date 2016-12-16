@@ -1,9 +1,8 @@
 ﻿using System;
-using CQRSlite.Commands;
 
 namespace Zuehlke.Eacm.Web.Backend.Commands
 {
-    public class CreateEntityCommand : ICommand
+    public class CreateEntityCommand : IDomainCommand
     {
         public Guid Id { get; set; }
 

@@ -1,9 +1,8 @@
 ﻿using System;
-using CQRSlite.Commands;
 
 namespace Zuehlke.Eacm.Web.Backend.Commands
 {
-    public class DeletePropertyCommand : ICommand
+    public class DeletePropertyCommand : IDomainCommand
     {
         public Guid Id { get; set; }
 
