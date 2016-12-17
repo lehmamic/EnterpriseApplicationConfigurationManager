@@ -204,6 +204,33 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             Assert.Equal(HttpStatusCode.NotFound, readResponse.StatusCode);
         }
 
+        // [Fact]
+        public async void CreateProperty_WithValidPropertyValues_CreatesProperty()
+        {
+            // arrange
+            var existingProject = await this.PrepareProject();
+            var existingEntity = await this.PrepareEntity(existingProject.Id);
+
+            var value = new PropertyDto
+            {
+                Name = "New Property Name",
+                Description = "New Property Description",
+                PropertyType = "Zuehlke.Eacm.String"
+            };
+
+            // act
+            HttpResponseMessage response =
+                await this.context.Client.PostAsJsonAsync($"api/projects/{existingProject.Id}/entities/{existingEntity.Id}/properties", value);
+
+            // arrange
+            Assert.True(response.IsSuccessStatusCode);
+
+            var propertyDto = await response.ReadAsAsync<PropertyDto>();
+            Assert.Equal(propertyDto.Name, propertyDto.Name);
+            Assert.Equal(propertyDto.Description, propertyDto.Description);
+            Assert.Equal(propertyDto.PropertyType, propertyDto.PropertyType);
+        }
+
         private async Task<ProjectDto> PrepareProject()
         {
             var createProjectDto = new ProjectDto

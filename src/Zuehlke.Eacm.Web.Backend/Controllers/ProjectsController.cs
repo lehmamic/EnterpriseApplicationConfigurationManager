@@ -171,5 +171,61 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
 
             return this.NoContent();
         }
+
+        [HttpGet("{projectId}/entities/{entityId}/Properties/{id}")]
+        public IActionResult GetProperty(Guid projectId, Guid entityId, Guid id)
+        {
+            var currentProject = this.dbContext.Projects.SingleOrDefault(p => p.Id == projectId);
+            if (currentProject == null)
+            {
+                return this.NotFound();
+            }
+
+            var entity = this.dbContext.Entities.FirstOrDefault(p => p.Id == entityId && p.ProjectId == projectId);
+            if (entity == null)
+            {
+                return this.NotFound();
+            }
+
+            var property = this.dbContext.Properties.FirstOrDefault(p => p.Id == id && p.EntityId == entityId);
+            if (property == null)
+            {
+                return this.NotFound();
+            }
+
+            return this.Ok(this.mapper.Map<PropertyDto>(property));
+        }
+
+        [HttpGet("{projectId}/entities/{entityId}/Properties")]
+        public IActionResult CreateProperty(Guid projectId, Guid entityId, [FromBody] PropertyDto property)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.BadRequest(this.ModelState);
+            }
+
+            var currentProject = this.dbContext.Projects.SingleOrDefault(p => p.Id == projectId);
+            if (currentProject == null)
+            {
+                return this.NotFound();
+            }
+
+            var currentEntity = this.dbContext.Entities.SingleOrDefault(p => p.Id == entityId && p.ProjectId == projectId);
+            if (currentEntity == null)
+            {
+                return this.NotFound();
+            }
+
+            var command = this.mapper.Map<CreatePropertyCommand>(property, projectId, currentProject.Version);
+            command.ParentEntityId = entityId;
+
+            this.commandSender.Send(command);
+
+            var projectReadModel = this.dbContext.Properties.First(p => p.EntityId == entityId && p.Name == property.Name);
+            return this.CreatedAtRoute(
+                "GetProperty",
+                new { ProjectId = projectId, EntityId = entityId, projectReadModel.Id },
+                this.mapper.Map<EntityDto>(projectReadModel));
+        }
     }
 }
