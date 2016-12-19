@@ -226,9 +226,30 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             Assert.True(response.IsSuccessStatusCode);
 
             var propertyDto = await response.ReadAsAsync<PropertyDto>();
-            Assert.Equal(propertyDto.Name, propertyDto.Name);
-            Assert.Equal(propertyDto.Description, propertyDto.Description);
-            Assert.Equal(propertyDto.PropertyType, propertyDto.PropertyType);
+            Assert.Equal(value.Name, propertyDto.Name);
+            Assert.Equal(value.Description, propertyDto.Description);
+            Assert.Equal(value.PropertyType, propertyDto.PropertyType);
+        }
+
+        [Fact]
+        public async void GetProperty_WithValidProjecctEntityAndPropertyIds_ReturnsProperty()
+        {
+            // arrange
+            var existingProject = await this.PrepareProject();
+            var existingEntity = await this.PrepareEntity(existingProject.Id);
+            var existingProperty = await this.PrepareProperty(existingProject.Id, existingEntity.Id);
+
+            // act
+            HttpResponseMessage response =
+                await this.context.Client.GetAsync($"api/projects/{existingProject.Id}/entities/{existingEntity.Id}/properties/{existingProperty.Id}");
+
+            // assert
+            Assert.True(response.IsSuccessStatusCode);
+
+            var propertyDto = await response.ReadAsAsync<PropertyDto>();
+            Assert.Equal(existingProperty.Name, propertyDto.Name);
+            Assert.Equal(existingProperty.Description, propertyDto.Description);
+            Assert.Equal(existingProperty.PropertyType, propertyDto.PropertyType);
         }
 
         private async Task<ProjectDto> PrepareProject()
@@ -252,6 +273,21 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
 
             var response = await this.context.Client.PostAsJsonAsync($"api/projects/{projectId}/entities", createEntityDto);
             return await response.ReadAsAsync<EntityDto>();
+        }
+
+        private async Task<PropertyDto> PrepareProperty(Guid projectId, Guid entityId)
+        {
+            var value = new PropertyDto
+            {
+                Name = "New Property Name",
+                Description = "New Property Description",
+                PropertyType = "Zuehlke.Eacm.String"
+            };
+
+            HttpResponseMessage response =
+                await this.context.Client.PostAsJsonAsync($"api/projects/{projectId}/entities/{entityId}/properties", value);
+
+            return await response.ReadAsAsync<PropertyDto>();
         }
     }
 }
