@@ -172,7 +172,7 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
             return this.NoContent();
         }
 
-        [HttpGet("{projectId}/entities/{entityId}/Properties/{id}")]
+        [HttpGet("{projectId}/entities/{entityId}/properties/{id}", Name = "GetProperty")]
         public IActionResult GetProperty(Guid projectId, Guid entityId, Guid id)
         {
             var currentProject = this.dbContext.Projects.SingleOrDefault(p => p.Id == projectId);
@@ -196,7 +196,7 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
             return this.Ok(this.mapper.Map<PropertyDto>(property));
         }
 
-        [HttpGet("{projectId}/entities/{entityId}/Properties")]
+        [HttpPost("{projectId}/entities/{entityId}/Properties")]
         public IActionResult CreateProperty(Guid projectId, Guid entityId, [FromBody] PropertyDto property)
         {
             if (!this.ModelState.IsValid)
@@ -221,11 +221,11 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
 
             this.commandSender.Send(command);
 
-            var projectReadModel = this.dbContext.Properties.First(p => p.EntityId == entityId && p.Name == property.Name);
+            var propertyReadModel = this.dbContext.Properties.First(p => p.EntityId == entityId && p.Name == property.Name);
             return this.CreatedAtRoute(
                 "GetProperty",
-                new { ProjectId = projectId, EntityId = entityId, projectReadModel.Id },
-                this.mapper.Map<EntityDto>(projectReadModel));
+                new { ProjectId = projectId, EntityId = entityId, propertyReadModel.Id },
+                this.mapper.Map<PropertyDto>(propertyReadModel));
         }
     }
 }
