@@ -204,7 +204,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             Assert.Equal(HttpStatusCode.NotFound, readResponse.StatusCode);
         }
 
-        // [Fact]
+        [Fact]
         public async void CreateProperty_WithValidPropertyValues_CreatesProperty()
         {
             // arrange
