@@ -9,6 +9,7 @@ using Zuehlke.Eacm.Web.Backend.DataAccess;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.Models;
 using Zuehlke.Eacm.Web.Backend.Utils.Mapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace Zuehlke.Eacm.Web.Backend.Controllers
 {
@@ -154,10 +155,17 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
                 return this.BadRequest(this.ModelState);
             }
 
-            var currentProject = this.dbContext.Projects.SingleOrDefault(p => p.Id == projectId);
+            var currentProject = this.dbContext.Projects
+                .Include(p => p.Entities)
+                .SingleOrDefault(p => p.Id == projectId);
             if (currentProject == null)
             {
                 return this.NoContent();
+            }
+            var currentEntity = this.dbContext.Entities.FirstOrDefault(p => p.Id == id);
+            if (currentEntity == null)
+            {
+                return this.NotFound();
             }
 
             var command = new DeleteEntityCommand
@@ -181,19 +189,44 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
                 return this.NotFound();
             }
 
-            var entity = this.dbContext.Entities.FirstOrDefault(p => p.Id == entityId && p.ProjectId == projectId);
-            if (entity == null)
+            var currentEntity = this.dbContext.Entities.FirstOrDefault(p => p.Id == entityId);
+            if (currentEntity == null)
             {
                 return this.NotFound();
             }
 
-            var property = this.dbContext.Properties.FirstOrDefault(p => p.Id == id && p.EntityId == entityId);
-            if (property == null)
+            var currentProperty = this.dbContext.Properties.FirstOrDefault(p => p.Id == id && p.EntityId == entityId);
+            if (currentProperty == null)
             {
                 return this.NotFound();
             }
 
-            return this.Ok(this.mapper.Map<PropertyDto>(property));
+            return this.Ok(this.mapper.Map<PropertyDto>(currentProperty));
+        }
+
+        [HttpGet("{projectId}/entities/{entityId}/properties")]
+        public IActionResult GetProperties(Guid projectId, Guid entityId)
+        {
+            var currentProject = this.dbContext.Projects
+                .Include(p => p.Entities)
+                    .ThenInclude(e => e.Properties)
+                .SingleOrDefault(p => p.Id == projectId);
+            if (currentProject == null)
+            {
+                return this.NotFound();
+            }
+
+            var currentEntity = currentProject.Entities
+                .FirstOrDefault(p => p.Id == entityId);
+            if (currentEntity == null)
+            {
+                return this.NotFound();
+            }
+
+            var properties = currentEntity.Properties
+                .Where(p => p.EntityId == entityId);
+
+            return this.Ok(this.mapper.Map<IEnumerable<PropertyDto>>(properties));
         }
 
         [HttpPost("{projectId}/entities/{entityId}/Properties")]
@@ -204,13 +237,16 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
                 return this.BadRequest(this.ModelState);
             }
 
-            var currentProject = this.dbContext.Projects.SingleOrDefault(p => p.Id == projectId);
+            var currentProject = this.dbContext.Projects
+                .Include(p => p.Entities)
+                .SingleOrDefault(p => p.Id == projectId);
             if (currentProject == null)
             {
                 return this.NotFound();
             }
 
-            var currentEntity = this.dbContext.Entities.SingleOrDefault(p => p.Id == entityId && p.ProjectId == projectId);
+            var currentEntity = currentProject.Entities
+                .SingleOrDefault(p => p.Id == entityId);
             if (currentEntity == null)
             {
                 return this.NotFound();
@@ -226,6 +262,79 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
                 "GetProperty",
                 new { ProjectId = projectId, EntityId = entityId, propertyReadModel.Id },
                 this.mapper.Map<PropertyDto>(propertyReadModel));
+        }
+
+        [HttpPut("{projectId}/entities/{entityId}/properties/{id}", Name = "GetProperty")]
+        public IActionResult UpdateProperty(Guid projectId, Guid entityId, Guid id, [FromBody]PropertyDto property)
+        {
+            var currentProject = this.dbContext.Projects
+                .Include(p => p.Entities)
+                    .ThenInclude(p => p.Properties)
+                .SingleOrDefault(p => p.Id == projectId);
+            if (currentProject == null)
+            {
+                return this.NotFound();
+            }
+
+            var currentEntity = currentProject.Entities.FirstOrDefault(p => p.Id == entityId && p.ProjectId == projectId);
+            if (currentEntity == null)
+            {
+                return this.NotFound();
+            }
+
+            var currentProperty = currentEntity.Properties.FirstOrDefault(p => p.Id == id && p.EntityId == entityId);
+            if (currentProperty == null)
+            {
+                return this.NotFound();
+            }
+
+            property.Id = id;
+            var command = this.mapper.Map<ModifyPropertyCommand>(currentProperty, projectId, currentProject.Version);
+            this.commandSender.Send(command);
+
+            return this.NoContent();
+        }
+
+        [HttpDelete("{projectId}/entities/{entityId}/properties/{id}")]
+        public IActionResult DeleteProperty(Guid projectId, Guid entityId, Guid id)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.BadRequest(this.ModelState);
+            }
+
+            var currentProject = this.dbContext.Projects
+                .Include(p => p.Entities)
+                    .ThenInclude(p => p.Properties)
+                .SingleOrDefault(p => p.Id == projectId);
+
+            if (currentProject == null)
+            {
+                return this.NoContent();
+            }
+
+            var currentEntity = currentProject.Entities.FirstOrDefault(p => p.Id == entityId);
+            if (currentEntity == null)
+            {
+                return this.NoContent();
+            }
+
+            var currentProperty = currentEntity.Properties.FirstOrDefault(p => p.Id == id);
+            if (currentProperty == null)
+            {
+                return this.NoContent();
+            }
+
+            var command = new DeleteEntityCommand
+            {
+                Id = projectId,
+                ExpectedVersion = currentProject.Version,
+                EntityId = id
+            };
+
+            this.commandSender.Send(command);
+
+            return this.NoContent();
         }
     }
 }
