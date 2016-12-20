@@ -36,6 +36,11 @@ namespace Zuehlke.Eacm.Web.Backend.Models
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.ExpectedVersion, opt => opt.Ignore())
                 .ForMember(dest => dest.ParentEntityId, opt => opt.Ignore());
+
+            this.CreateMap<PropertyDto, ModifyPropertyCommand>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ExpectedVersion, opt => opt.Ignore())
+                .ForMember(dest => dest.PropertyId, opt => opt.MapFrom(src => src.Id));
         }
     }
 }
