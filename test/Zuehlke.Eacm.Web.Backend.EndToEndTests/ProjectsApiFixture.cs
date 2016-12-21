@@ -252,6 +252,74 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
             Assert.Equal(existingProperty.PropertyType, propertyDto.PropertyType);
         }
 
+        [Fact]
+        public async void GetProperties_WithoutQueryOptions_ReturnsProperty()
+        {
+            // arrange
+            var existingProject = await this.PrepareProject();
+            var existingEntity = await this.PrepareEntity(existingProject.Id);
+            var existingProperty1 = await this.PrepareProperty(existingProject.Id, existingEntity.Id);
+            var existingProperty2 = await this.PrepareProperty(existingProject.Id, existingEntity.Id);
+
+            // act
+            HttpResponseMessage response =
+                await this.context.Client.GetAsync($"api/projects/{existingProject.Id}/entities/{existingEntity.Id}/properties");
+
+            // assert
+            Assert.True(response.IsSuccessStatusCode);
+
+            var actualProperties = (await response.ReadAsAsync<IEnumerable<PropertyDto>>()).ToArray();
+            Assert.Contains(actualProperties, p => p.Id == existingProperty1.Id);
+            Assert.Contains(actualProperties, p => p.Id == existingProperty2.Id);
+        }
+
+        [Fact]
+        public async void UpdateProperty_WithValidPropertyValues_UpdatesProperty()
+        {
+            // arrange
+            var existingProject = await this.PrepareProject();
+            var existingEntity = await this.PrepareEntity(existingProject.Id);
+            var existingProperty = await this.PrepareProperty(existingProject.Id, existingEntity.Id);
+
+            var value = new PropertyDto
+            {
+                Name = "New Property Name",
+                Description = "New Property Description",
+                PropertyType = "Zuehlke.Eacm.String"
+            };
+
+            // act
+            HttpResponseMessage response =
+                await this.context.Client.PutAsJsonAsync($"api/projects/{existingProject.Id}/entities/{existingEntity.Id}/properties/{existingProperty.Id}", value);
+
+            // arrange
+            Assert.True(response.IsSuccessStatusCode);
+
+            var propertyDto = await this.context.Client.ReadAsAsync<PropertyDto>($"api/projects/{existingProject.Id}/entities/{existingEntity.Id}/properties/{existingProperty.Id}");
+            Assert.Equal(value.Name, propertyDto.Name);
+            Assert.Equal(value.Description, propertyDto.Description);
+            Assert.Equal(value.PropertyType, propertyDto.PropertyType);
+        }
+
+        [Fact]
+        public async void DeleteProperty_WithValidIds_RemovesProperty()
+        {
+            // arrange
+            var existingProject = await this.PrepareProject();
+            var existingEntity = await this.PrepareEntity(existingProject.Id);
+            var existingProperty = await this.PrepareProperty(existingProject.Id, existingEntity.Id);
+
+            // act
+            HttpResponseMessage deleteResponse =
+                await this.context.Client.DeleteAsync($"api/projects/{existingProject.Id}/entities/{existingEntity.Id}/properties/{existingProperty.Id}");
+
+            // arrange
+            Assert.True(deleteResponse.IsSuccessStatusCode);
+
+            var readResponse = await this.context.Client.GetAsync($"api/projects/{existingProject.Id}/entities/{existingEntity.Id}/properties/{existingProperty.Id}");
+            Assert.Equal(HttpStatusCode.NotFound, readResponse.StatusCode);
+        }
+
         private async Task<ProjectDto> PrepareProject()
         {
             var createProjectDto = new ProjectDto
@@ -279,7 +347,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         {
             var value = new PropertyDto
             {
-                Name = "New Property Name",
+                Name = $"New Property Name {Guid.NewGuid()}",
                 Description = "New Property Description",
                 PropertyType = "Zuehlke.Eacm.String"
             };
