@@ -289,7 +289,7 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
             }
 
             property.Id = id;
-            var command = this.mapper.Map<ModifyPropertyCommand>(currentProperty, projectId, currentProject.Version);
+            var command = this.mapper.Map<ModifyPropertyCommand>(property, projectId, currentProject.Version);
             this.commandSender.Send(command);
 
             return this.NoContent();
@@ -325,11 +325,11 @@ namespace Zuehlke.Eacm.Web.Backend.Controllers
                 return this.NoContent();
             }
 
-            var command = new DeleteEntityCommand
+            var command = new DeletePropertyCommand
             {
                 Id = projectId,
                 ExpectedVersion = currentProject.Version,
-                EntityId = id
+                PropertyId = id
             };
 
             this.commandSender.Send(command);
