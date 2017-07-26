@@ -2,5 +2,14 @@
   <a md-button class="button" routerLink="/" aria-label="Configuration Manager">
     Configuration Manager
   </a>
+  <md-menu #projectsMenu="mdMenu">
+    <a md-button class="button" routerLink="/projects" aria-label="All Projects">
+      All Projects
+    </a>
+  </md-menu>
+
+  <button md-icon-button [mdMenuTriggerFor]="projectsMenu">
+    <md-icon>Projects</md-icon>
+  </button>
   <div class="flex-spacer"></div>
 </nav>
