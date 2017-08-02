@@ -11,9 +11,11 @@ import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { AppComponent } from './app.component';
+import { routes } from './app.routes';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { environment } from '../environments/environment'
 import { reducers } from './app.reducer';
+import { ProjectsModule } from './projects/projects.module'
 
 import 'hammerjs';
 
@@ -29,10 +31,11 @@ import 'hammerjs';
     BrowserAnimationsModule,
     MaterialModule,
     StoreModule.forRoot(reducers),
-    //RouterModule.forRoot(routes, { useHash: false }),
-    //StoreRouterConnectingModule,
+    RouterModule.forRoot(routes, { useHash: false }),
+    StoreRouterConnectingModule,
     !environment.production ? StoreDevtoolsModule.instrument() : [],
-    EffectsModule.forRoot([])
+    EffectsModule.forRoot([]),
+    ProjectsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
