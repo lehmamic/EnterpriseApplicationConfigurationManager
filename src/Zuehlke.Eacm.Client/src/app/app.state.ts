@@ -12,5 +12,6 @@ export interface AppState {
 
 export interface RootState {
   app: AppState;
+  projects: ProjectsState;
   routerReducer: RouterReducerState;
 };

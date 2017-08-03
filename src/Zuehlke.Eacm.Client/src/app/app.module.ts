@@ -18,6 +18,7 @@ import { reducers } from './app.reducer';
 import { ProjectsModule } from './projects/projects.module'
 
 import 'hammerjs';
+import { ProjectsEffects } from "./projects/projects.effects";
 
 @NgModule({
   declarations: [
@@ -34,7 +35,7 @@ import 'hammerjs';
     RouterModule.forRoot(routes, { useHash: false }),
     StoreRouterConnectingModule,
     !environment.production ? StoreDevtoolsModule.instrument() : [],
-    EffectsModule.forRoot([]),
+    EffectsModule.forRoot([ProjectsEffects]),
     ProjectsModule
   ],
   providers: [],
