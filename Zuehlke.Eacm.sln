@@ -1,23 +1,22 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26114.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{20EFBACB-21CE-4C2B-BFC1-F5EA5A508697}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B1AD3F3E-6455-42BF-9C66-DECE7EA50DAB}"
 	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
 		Zuehlke.Eacm.DotSettings = Zuehlke.Eacm.DotSettings
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Zuehlke.Eacm.Web.Backend", "src\Zuehlke.Eacm.Web.Backend\Zuehlke.Eacm.Web.Backend.xproj", "{570EE828-5964-46FA-AA2D-BAD06C3F6224}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zuehlke.Eacm.Web.Backend", "src\Zuehlke.Eacm.Web.Backend\Zuehlke.Eacm.Web.Backend.csproj", "{570EE828-5964-46FA-AA2D-BAD06C3F6224}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{53AC10C0-61CA-4753-9120-6C8CA82C0F32}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Zuehlke.Eacm.Web.Backend.Tests", "test\Zuehlke.Eacm.Web.Backend.Tests\Zuehlke.Eacm.Web.Backend.Tests.xproj", "{141B2750-C2CE-4A5C-A79F-7F81E4A33E9E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zuehlke.Eacm.Web.Backend.Tests", "test\Zuehlke.Eacm.Web.Backend.Tests\Zuehlke.Eacm.Web.Backend.Tests.csproj", "{141B2750-C2CE-4A5C-A79F-7F81E4A33E9E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Zuehlke.Eacm.Web.Backend.EndToEndTests", "test\Zuehlke.Eacm.Web.Backend.EndToEndTests\Zuehlke.Eacm.Web.Backend.EndToEndTests.xproj", "{BFB2EB75-52F2-48EE-A9C4-2D5AE173455E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zuehlke.Eacm.Web.Backend.EndToEndTests", "test\Zuehlke.Eacm.Web.Backend.EndToEndTests\Zuehlke.Eacm.Web.Backend.EndToEndTests.csproj", "{BFB2EB75-52F2-48EE-A9C4-2D5AE173455E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
