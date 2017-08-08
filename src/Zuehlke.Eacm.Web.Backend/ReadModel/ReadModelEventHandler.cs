@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using CQRSlite.Events;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
@@ -31,53 +32,53 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
             this.mapper = mapper.ArgumentNotNull(nameof(mapper));
         }
 
-        public void Handle(ProjectCreated message)
+        public async Task Handle(ProjectCreated message)
         {
             message.ArgumentNotNull(nameof(message));
 
             var project = this.mapper.Map<ConfigurationProject>(message);
-            this.dbContext.Projects.Add(project);
+            await this.dbContext.Projects.AddAsync(project);
 
-            this.dbContext.SaveChanges();
+			await this.dbContext.SaveChangesAsync();
         }
 
-        public void Handle(ProjectModified message)
+        public async Task Handle(ProjectModified message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            this.UpdateProject(message);
-            this.dbContext.SaveChanges();
+			await this.UpdateProjectAsync(message);
+            await this.dbContext.SaveChangesAsync();
         }
 
-        public void Handle(EntityDefinitionAdded message)
+        public async Task Handle(EntityDefinitionAdded message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            this.AddEntity<EntityDefinitionAdded, ConfigurationEntity>(message);
-            this.dbContext.SaveChanges();
+			await this.AddEntityAsync<EntityDefinitionAdded, ConfigurationEntity>(message);
+			await this.dbContext.SaveChangesAsync();
         }
 
-        public void Handle(EntityDefinitionModified message)
+        public async Task Handle(EntityDefinitionModified message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            this.UpdateEntity<EntityDefinitionModified, ConfigurationEntity>(message, m => m.EntityId);
-            this.dbContext.SaveChanges();
+            await this.UpdateEntityAsync<EntityDefinitionModified, ConfigurationEntity>(message, m => m.EntityId);
+			await this.dbContext.SaveChangesAsync();
         }
 
-        public void Handle(EntityDefinitionDeleted message)
+        public async Task Handle(EntityDefinitionDeleted message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            this.DeleteEntity<EntityDefinitionDeleted, ConfigurationEntity>(message, m => m.EntityId);
-            this.dbContext.SaveChanges();
+			await this.DeleteEntityAsync<EntityDefinitionDeleted, ConfigurationEntity>(message, m => m.EntityId);
+            await this.dbContext.SaveChangesAsync();
         }
 
-        public void Handle(PropertyDefinitionAdded message)
+        public async Task Handle(PropertyDefinitionAdded message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            this.AddEntity<PropertyDefinitionAdded, ConfigurationProperty>(message);
+            await this.AddEntityAsync<PropertyDefinitionAdded, ConfigurationProperty>(message);
 
             var entries = this.dbContext.Entries.Where(e => e.EntityId == message.ParentEntityId);
             var newPropertyValues = entries.Select(entry => new ConfigurationValue
@@ -89,30 +90,30 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
 
             this.dbContext.Values.AddRange(newPropertyValues);
 
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
         }
 
-        public void Handle(PropertyDefinitionModified message)
+        public async Task Handle(PropertyDefinitionModified message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            this.UpdateEntity<PropertyDefinitionModified, ConfigurationProperty>(message, m => m.PropertyId);
-            this.dbContext.SaveChanges();
+			await this.UpdateEntityAsync<PropertyDefinitionModified, ConfigurationProperty>(message, m => m.PropertyId);
+            await this.dbContext.SaveChangesAsync();
         }
 
-        public void Handle(PropertyDefinitionDeleted message)
+        public async Task Handle(PropertyDefinitionDeleted message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            this.DeleteEntity<PropertyDefinitionDeleted, ConfigurationProperty>(message, m => m.PropertyId);
-            this.dbContext.SaveChanges();
+            await this.DeleteEntityAsync<PropertyDefinitionDeleted, ConfigurationProperty>(message, m => m.PropertyId);
+            await this.dbContext.SaveChangesAsync();
         }
 
-        public void Handle(ConfigurationEntryAdded message)
+        public async Task Handle(ConfigurationEntryAdded message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            this.UpdateProject(message);
+			await this.UpdateProjectAsync(message);
 
             var entry = this.mapper.Map<ConfigurationEntry>(message);
             this.dbContext.Entries.Add(entry);
@@ -120,14 +121,14 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
             var values = this.mapper.Map<IEnumerable<ConfigurationValue>>(message);
             this.dbContext.Values.AddRange(values);
 
-            this.dbContext.SaveChanges();
+			await this.dbContext.SaveChangesAsync();
         }
 
-        public void Handle(ConfigurationEntryModified message)
+        public async Task Handle(ConfigurationEntryModified message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            this.UpdateProject(message);
+			await this.UpdateProjectAsync(message);
 
             IQueryable<ConfigurationValue> oldValues = this.dbContext.Values.Where(p => p.EntryId == message.EntryId);
             this.dbContext.Values.RemoveRange(oldValues);
@@ -135,58 +136,67 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
             var newValues = this.mapper.Map<IEnumerable<ConfigurationValue>>(message);
             this.dbContext.Values.AddRange(newValues);
 
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
         }
 
-        public void Handle(ConfigurationEntryDeleted message)
+        public async Task Handle(ConfigurationEntryDeleted message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            this.UpdateProject(message);
+			await this.UpdateProjectAsync(message);
 
             ConfigurationEntry entry = this.dbContext.Entries.Single(p => p.Id == message.EntryId);
             this.dbContext.Entries.Remove(entry);
 
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
         }
 
-        private void AddEntity<TEvent, TEntity>(TEvent message)
+		private async Task AddEntityAsync<TEvent, TEntity>(TEvent message)
             where TEvent : IEvent
             where TEntity : class, IDataModel
         {
-            this.UpdateProject(message);
+			await this.UpdateProjectAsync(message);
 
             var entity = this.mapper.Map<TEntity>(message);
-            this.dbContext.Set<TEntity>().Add(entity);
+            await this.dbContext.Set<TEntity>().AddAsync(entity);
         }
 
-        private void UpdateEntity<TEvent, TEntity>(TEvent message, Func<TEvent, Guid> entityIdSelector)
+		private async Task UpdateEntityAsync<TEvent, TEntity>(TEvent message, Func<TEvent, Guid> entityIdSelector)
             where TEvent : IEvent
             where TEntity : class, IDataModel
         {
-            this.UpdateProject(message);
+			await this.UpdateProjectAsync(message);
 
             Guid entityId = entityIdSelector(message);
 
-            TEntity entity = this.dbContext.Set<TEntity>().Single(p => p.Id == entityId);
+			TEntity entity = await this.dbContext.Set<TEntity>()
+			                           .ToAsyncEnumerable()
+			                           .Single(p => p.Id == entityId);
+			
             this.mapper.Map(message, entity);
         }
 
-        private void DeleteEntity<TEvent, TEntity>(TEvent message, Func<TEvent, Guid> entityIdSelector)
+		private async Task DeleteEntityAsync<TEvent, TEntity>(TEvent message, Func<TEvent, Guid> entityIdSelector)
             where TEvent : IEvent
             where TEntity : class, IDataModel
         {
-            this.UpdateProject(message);
+			await this.UpdateProjectAsync(message);
 
             Guid entityId = entityIdSelector(message);
 
-            TEntity entity = this.dbContext.Set<TEntity>().Single(p => p.Id == entityId);
-            this.dbContext.Set<TEntity>().Remove(entity);
+			TEntity entity = await this.dbContext.Set<TEntity>()
+			                     .ToAsyncEnumerable()
+								 .Single(p => p.Id == entityId);
+			
+			this.dbContext.Set<TEntity>().Remove(entity);
         }
 
-        private void UpdateProject<TEvent>(TEvent message) where TEvent : IEvent
+		private async Task UpdateProjectAsync<TEvent>(TEvent message) where TEvent : IEvent
         {
-            var project = this.dbContext.Projects.Single(p => p.Id == message.Id);
+            var project = await this.dbContext.Projects
+			                  .ToAsyncEnumerable()
+			                  .Single(p => p.Id == message.Id);
+			
             this.mapper.Map(message, project);
         }
     }

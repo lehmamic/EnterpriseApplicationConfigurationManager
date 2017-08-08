@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CQRSlite.Events;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.Utils.Serialization;
@@ -21,9 +23,9 @@ namespace Zuehlke.Eacm.Web.Backend.DataAccess
             this.publisher = publisher.ArgumentNotNull(nameof(publisher));
         }
 
-        public void Save<T>(IEnumerable<IEvent> events)
-        {
-            events.ArgumentNotNull(nameof(events));
+        public async Task Save(IEnumerable<IEvent> events, CancellationToken cancellationToken = default(CancellationToken))
+		{       
+			events.ArgumentNotNull(nameof(events));
 
             foreach (var e in events)
             {
@@ -31,27 +33,28 @@ namespace Zuehlke.Eacm.Web.Backend.DataAccess
                 {
                     Id = Guid.NewGuid(),
                     AggregateId = e.Id,
-                    AggregateType = typeof(T).Name,
                     Timestamp = e.TimeStamp,
                     Version = e.Version,
                     User = "DummyUser",
                     Payload = this.Serialize(e)
                 };
 
-                this.dbContext.Events.Add(@event);
-                this.dbContext.SaveChanges();
+				await this.dbContext.Events.AddAsync(@event);
+                await this.dbContext.SaveChangesAsync();
 
-                this.publisher.Publish(e);
+                await this.publisher.Publish(e);
             }
-        }
+		}
 
-        public IEnumerable<IEvent> Get<T>(Guid aggregateId, int fromVersion)
+        public async Task<IEnumerable<IEvent>> Get(Guid aggregateId, int fromVersion, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return this.dbContext.Events
-                .Where(e => e.AggregateId == aggregateId && e.AggregateType == typeof(T).Name)
+            return await this.dbContext.Events
+                .Where(e => e.AggregateId == aggregateId)
                 .Where(e => e.Version > fromVersion)
                 .Select(e => this.Deserialize(e.Payload))
-                .OrderByDescending(e => e.Version);
+				.OrderByDescending(e => e.Version)
+				.ToAsyncEnumerable()
+				.ToList();
         }
 
         private string Serialize(IEvent @event)

@@ -2,12 +2,8 @@
 
 namespace Zuehlke.Eacm.Web.Backend.Commands
 {
-    public class CreateProjectCommand : IDomainCommand
+    public class CreateProjectCommand : DomainCommand
     {
-        public Guid Id { get; set; }
-
         public string Name { get; set; }
-
-        public int ExpectedVersion { get; set; }
     }
 }

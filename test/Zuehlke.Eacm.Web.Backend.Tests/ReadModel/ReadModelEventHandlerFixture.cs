@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using Zuehlke.Eacm.Web.Backend.DataAccess;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
@@ -21,7 +22,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_ProjectCreatedEvent_CreatesProject()
+        public async Task Handle_ProjectCreatedEvent_CreatesProject()
         {
             // arrange
             var message = new ProjectCreated
@@ -35,7 +36,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var project = this.context.DbContext.Projects.FirstOrDefault(p => p.Id == message.Id);
@@ -47,7 +48,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_ProjectModifiedEvent_UpdatesProject()
+        public async Task Handle_ProjectModifiedEvent_UpdatesProject()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -64,7 +65,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var project = this.context.DbContext.Projects.FirstOrDefault(p => p.Id == message.Id);
@@ -76,7 +77,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_EntityDefinitionAddedEvent_UpdatesProjectVersionTracking()
+        public async Task Handle_EntityDefinitionAddedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -94,7 +95,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
@@ -104,7 +105,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_EntityDefinitionAddedEvent_CreatesEntity()
+        public async Task Handle_EntityDefinitionAddedEvent_CreatesEntity()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -122,7 +123,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var entity = this.context.DbContext.Entities.FirstOrDefault(p => p.Id == message.EntityId);
@@ -134,7 +135,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_EntityDefinitionModifiedEvent_UpdatesProjectVersionTracking()
+        public async Task Handle_EntityDefinitionModifiedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -153,7 +154,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
@@ -163,7 +164,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_EntityDefinitionModifiedEvent_UpdatesEntity()
+        public async Task Handle_EntityDefinitionModifiedEvent_UpdatesEntity()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -182,7 +183,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var entity = this.context.DbContext.Entities.FirstOrDefault(p => p.Id == message.EntityId);
@@ -194,7 +195,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_EntityDefinitionDeletedEvent_UpdatesProjectVersionTracking()
+        public async Task Handle_EntityDefinitionDeletedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -211,7 +212,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
@@ -221,7 +222,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_EntityDefinitionDeletedEvent_RemovesEntity()
+        public async Task Handle_EntityDefinitionDeletedEvent_RemovesEntity()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -238,7 +239,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var entity = this.context.DbContext.Entities.FirstOrDefault(p => p.Id == message.EntityId);
@@ -246,7 +247,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_EntityDefinitionDeletedEvent_RemovesPropertiesOfEntity()
+        public async Task Handle_EntityDefinitionDeletedEvent_RemovesPropertiesOfEntity()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -263,7 +264,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var properties = this.context.DbContext.Properties.Where(p => p.EntityId == message.EntityId);
@@ -271,7 +272,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_EntityDefinitionDeletedEvent_RemovesEntriesOfEntity()
+        public async Task Handle_EntityDefinitionDeletedEvent_RemovesEntriesOfEntity()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -288,7 +289,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var entries = this.context.DbContext.Entries.Where(p => p.EntityId == message.EntityId);
@@ -296,7 +297,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_EntityDefinitionDeletedEvent_RemovesValuesOfEntity()
+        public async Task Handle_EntityDefinitionDeletedEvent_RemovesValuesOfEntity()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -314,7 +315,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var values = this.context.DbContext.Values.Where(p => p.EntryId == initialEntry.Id);
@@ -322,7 +323,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_PropertyDefinitionAddedEvent_UpdatesProjectVersionTracking()
+        public async Task Handle_PropertyDefinitionAddedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -342,7 +343,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
@@ -352,7 +353,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_PropertyDefinitionAddedEvent_CreatesProperty()
+        public async Task Handle_PropertyDefinitionAddedEvent_CreatesProperty()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -372,7 +373,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var property = this.context.DbContext.Properties.FirstOrDefault(p => p.Id == message.PropertyId);
@@ -383,7 +384,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_PropertyDefinitionAddedEvent_AddsValueToEntry()
+        public async Task Handle_PropertyDefinitionAddedEvent_AddsValueToEntry()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -404,7 +405,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var values = this.context.DbContext.Values.Where(p => p.EntryId == initialEntry.Id);
@@ -416,7 +417,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_PropertyDefinitionModifiedEvent_UpdatesProjectVersionTracking()
+        public async Task Handle_PropertyDefinitionModifiedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -436,7 +437,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
@@ -446,7 +447,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_PropertyDefinitionModifiedEvent_UpdatesProperty()
+        public async Task Handle_PropertyDefinitionModifiedEvent_UpdatesProperty()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -466,7 +467,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var property = this.context.DbContext.Properties.FirstOrDefault(p => p.Id == message.PropertyId);
@@ -477,7 +478,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_PropertyDefinitionDeletedEvent_UpdatesProjectVersionTracking()
+        public async Task Handle_PropertyDefinitionDeletedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -494,7 +495,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
@@ -504,7 +505,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_PropertyDefinitionDeletedEvent_DeletesProperty()
+        public async Task Handle_PropertyDefinitionDeletedEvent_DeletesProperty()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -521,7 +522,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var property = this.context.DbContext.Properties.FirstOrDefault(p => p.Id == message.PropertyId);
@@ -529,7 +530,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_PropertyDefinitionDeletedEvent_DeletesValues()
+        public async Task Handle_PropertyDefinitionDeletedEvent_DeletesValues()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -546,7 +547,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var values = this.context.DbContext.Values.Where(v => v.PropertyId == initialProperty.Id);
@@ -554,7 +555,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_ConfigurationEntryAddedEvent_UpdatesProjectVersionTracking()
+        public async Task Handle_ConfigurationEntryAddedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -574,7 +575,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
@@ -584,7 +585,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_ConfigurationEntryAddedEvent_CreatesEntry()
+        public async Task Handle_ConfigurationEntryAddedEvent_CreatesEntry()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -604,7 +605,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var entry = this.context.DbContext.Entries.FirstOrDefault(p => p.Id == message.EntryId);
@@ -612,7 +613,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_ConfigurationEntryAddedEvent_CreatesValues()
+        public async Task Handle_ConfigurationEntryAddedEvent_CreatesValues()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -632,7 +633,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var value = this.context.DbContext.Values.FirstOrDefault(p => p.EntryId == message.EntryId);
@@ -642,7 +643,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_ConfigurationEntryModifiedEvent_UpdatesProjectVersionTracking()
+        public async Task Handle_ConfigurationEntryModifiedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -665,7 +666,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
@@ -675,7 +676,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_ConfigurationEntryModifiedEvent_UpdatesValues()
+        public async Task Handle_ConfigurationEntryModifiedEvent_UpdatesValues()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -698,7 +699,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var values = this.context.DbContext.Values.Where(p => p.EntryId == message.EntryId);
@@ -708,7 +709,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_ConfigurationEntryDeletedEvent_UpdatesProjectVersionTracking()
+        public async Task Handle_ConfigurationEntryDeletedEvent_UpdatesProjectVersionTracking()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -726,7 +727,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var project = this.context.DbContext.Projects.First(p => p.Id == message.Id);
@@ -736,7 +737,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_ConfigurationEntryDeletedEvent_DeletesEntry()
+        public async Task Handle_ConfigurationEntryDeletedEvent_DeletesEntry()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -754,7 +755,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var entry = this.context.DbContext.Entries.FirstOrDefault(e => e.Id == initialEntry.Id);
@@ -762,7 +763,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
         }
 
         [Fact]
-        public void Handle_ConfigurationEntryDeletedEvent_DeletesValues()
+        public async Task Handle_ConfigurationEntryDeletedEvent_DeletesValues()
         {
             // arrange
             var initialProject = this.CreateProject();
@@ -780,7 +781,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
 
             // act
-            target.Handle(message);
+            await target.Handle(message);
 
             // assert
             var values = this.context.DbContext.Values.Where(e => e.EntryId == initialEntry.Id);

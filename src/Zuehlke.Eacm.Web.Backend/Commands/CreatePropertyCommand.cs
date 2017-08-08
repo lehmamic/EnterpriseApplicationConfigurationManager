@@ -2,10 +2,8 @@
 
 namespace Zuehlke.Eacm.Web.Backend.Commands
 {
-    public class CreatePropertyCommand : IDomainCommand
+    public class CreatePropertyCommand : DomainCommand
     {
-        public Guid Id { get; set; }
-
         public Guid ParentEntityId { get; set; }
 
         public string Name { get; set; }
@@ -13,7 +11,5 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
         public string Description { get; set; }
 
         public string PropertyType { get; set; }
-
-        public int ExpectedVersion { get; set; }
     }
 }
