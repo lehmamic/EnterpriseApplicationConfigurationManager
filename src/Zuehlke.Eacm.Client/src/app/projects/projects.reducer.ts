@@ -1,6 +1,6 @@
-import { Action } from "@ngrx/store";
-import { ProjectsState, initialProjectState } from "./projects.state";
-import { LOAD_PROJECTS, LOAD_PROJECTS_SUCCESS, Actions, LOAD_PROJECTS_FAILED } from "./project.actions";
+import { Action } from '@ngrx/store';
+import { ProjectsState, initialProjectState } from './projects.state';
+import { LOAD_PROJECTS, LOAD_PROJECTS_SUCCESS, Actions, LOAD_PROJECTS_FAILED } from './projects.actions';
 
 export function projectsReducer(state: ProjectsState = initialProjectState, action: Actions) {
   switch (action.type) {

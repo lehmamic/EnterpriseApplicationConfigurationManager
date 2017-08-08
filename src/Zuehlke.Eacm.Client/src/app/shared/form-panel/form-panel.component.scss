@@ -1,0 +1,15 @@
+.form-panel-body-container {
+  padding-left: 60px;
+  width: 500px;
+}
+
+.form-panel-actions-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 8px 16px;
+
+  &:last-child {
+    margin-left: auto;
+  }
+}

@@ -18,12 +18,12 @@ import { reducers } from './app.reducer';
 import { ProjectsModule } from './projects/projects.module'
 
 import 'hammerjs';
-import { ProjectsEffects } from "./projects/projects.effects";
+import { ProjectsEffects } from './projects/projects.effects';
+import { SharedModule } from './shared';
 
 @NgModule({
   declarations: [
     AppComponent,
-    NavbarComponent
   ],
   imports: [
     BrowserModule,
@@ -36,6 +36,7 @@ import { ProjectsEffects } from "./projects/projects.effects";
     StoreRouterConnectingModule,
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     EffectsModule.forRoot([ProjectsEffects]),
+    SharedModule,
     ProjectsModule
   ],
   providers: [],

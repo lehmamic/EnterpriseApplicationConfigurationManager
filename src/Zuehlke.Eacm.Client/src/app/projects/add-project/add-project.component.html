@@ -1,0 +1,26 @@
+<app-page-header>
+  <div class="flex-spacer"></div>
+  <a md-button class="button pageheader-right" routerLink="/projects/add" aria-label="Add project">
+    Add project
+  </a>
+</app-page-header>
+
+<app-form-panel>
+  <app-form-panel-header>
+    <h3>Create a project</h3>
+  </app-form-panel-header>
+
+  <app-form-panel-body>
+    <md-input-container class="example-full-width">
+      <input mdInput required placeholder="Project Name">
+      <md-error>The project name is required</md-error>
+    </md-input-container>
+    <md-input-container class="example-full-width">
+      <textarea mdInput placeholder="Descriptions"></textarea>
+    </md-input-container>
+  </app-form-panel-body>
+
+  <app-form-panel-actions>
+    <button md-raised-button color="primary">Save</button>
+  </app-form-panel-actions>
+</app-form-panel>

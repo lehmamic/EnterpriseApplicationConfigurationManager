@@ -4,7 +4,7 @@ import { Store } from "@ngrx/store";
 import { RootState } from "../../app.state";
 import { Observable } from "rxjs/Observable";
 import { Project } from "../projects.service";
-import { LoadProjectsAction } from "../project.actions";
+import { LoadProjectsAction } from "../projects.actions";
 
 @Component({
   selector: 'app-all-projects',

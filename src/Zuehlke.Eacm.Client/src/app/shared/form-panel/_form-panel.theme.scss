@@ -1,0 +1,19 @@
+@mixin form-panel-theme($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+
+  app-form-panel {
+    color: mat-color($foreground, text);
+
+    .form-panel {
+      .form-panel-actions-container {
+        border-top-style: solid;
+        border-top-width: 1px;
+        border-top-color: mat-color($background, status-bar);
+      }
+    }
+  }
+}
