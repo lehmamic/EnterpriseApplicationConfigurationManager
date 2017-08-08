@@ -12,9 +12,6 @@ namespace Zuehlke.Eacm.Web.Backend.DataAccess
         public Guid AggregateId { get; set; }
 
         [Required]
-        public string AggregateType { get; set; }
-
-        [Required]
         public DateTimeOffset Timestamp { get; set; }
 
         [Required]

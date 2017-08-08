@@ -8,9 +8,10 @@ using Zuehlke.Eacm.Web.Backend.DataAccess;
 namespace Zuehlke.Eacm.Web.Backend.Migrations
 {
     [DbContext(typeof(EacmDbContext))]
-    partial class EacmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170808122621_RemoveAggregateName")]
+    partial class RemoveAggregateName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2")

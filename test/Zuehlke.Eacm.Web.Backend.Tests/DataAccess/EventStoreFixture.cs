@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CQRSlite.Events;
 using Moq;
 using Xunit;
@@ -23,7 +24,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DataAccess
         }
 
         [Fact]
-        public void Save_WithEvents_SavesEventsInDbContext()
+        public async Task Save_WithEvents_SavesEventsInDbContext()
         {
             // arrange
             var aggregateRootId = Guid.NewGuid();
@@ -39,15 +40,15 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DataAccess
 
             var target = new EventStore(this.context.DbContext, serializer, publisher.Object);
 
-            // act
-            target.Save<Project>(events);
+			// act
+			await target.Save(events);
 
             // assert
             Assert.Equal(2, this.context.DbContext.Events.Count());
         }
 
         [Fact]
-        public void Get_WithEvents_ReturnsEventsFromDbContext()
+        public async Task Get_WithEvents_ReturnsEventsFromDbContext()
         {
             // arrange
             var aggregateRootId = Guid.NewGuid();
@@ -62,17 +63,17 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DataAccess
             var publisher = new Mock<IEventPublisher>();
 
             var target = new EventStore(this.context.DbContext, serializer, publisher.Object);
-            target.Save<Project>(events);
+			await target.Save(events);
 
             // act
-            IEnumerable<IEvent> actual = target.Get<Project>(aggregateRootId, 0);
+            IEnumerable<IEvent> actual = await target.Get(aggregateRootId, 0);
 
             // assert
             Assert.Equal(2, actual.Count());
         }
 
         [Fact]
-        public void Get_WithFromVersionSmallerThanLatestVersion_ReturnsEventsNewerThanFromVersion()
+        public async Task Get_WithFromVersionSmallerThanLatestVersion_ReturnsEventsNewerThanFromVersion()
         {
             // arrange
             var aggregateRootId = Guid.NewGuid();
@@ -87,17 +88,17 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DataAccess
             var publisher = new Mock<IEventPublisher>();
 
             var target = new EventStore(this.context.DbContext, serializer, publisher.Object);
-            target.Save<Project>(events);
+			await target.Save(events);
 
             // act
-            IEnumerable<IEvent> actual = target.Get<Project>(aggregateRootId, 1);
+            IEnumerable<IEvent> actual = await target.Get(aggregateRootId, 1);
 
             // assert
             Assert.Equal(1, actual.Count());
         }
 
         [Fact]
-        public void Get_WithEventsFromOtherAggregateRoot_ReturnsOnlyEventsFromRequestedAggregateRoot()
+        public async Task Get_WithEventsFromOtherAggregateRoot_ReturnsOnlyEventsFromRequestedAggregateRoot()
         {
             // arrange
             var aggregateRootId = Guid.NewGuid();
@@ -112,11 +113,11 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.DataAccess
             var publisher = new Mock<IEventPublisher>();
 
             var target = new EventStore(this.context.DbContext, serializer, publisher.Object);
-            target.Save<Project>(events);
-            target.Save<TestAggregateRoot>(events);
+			await target.Save(events);
+			await target.Save(events);
 
             // act
-            IEnumerable<IEvent> actual = target.Get<Project>(aggregateRootId, 0);
+            IEnumerable<IEvent> actual = await target.Get(aggregateRootId, 0);
 
             // assert
             Assert.Equal(2, actual.Count());

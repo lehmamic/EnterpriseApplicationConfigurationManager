@@ -1,5 +1,8 @@
-﻿using CQRSlite.Commands;
+﻿using System;
+using System.Threading.Tasks;
+using CQRSlite.Commands;
 using CQRSlite.Domain;
+using CQRSlite.Messages;
 using Zuehlke.Eacm.Web.Backend.Diagnostics;
 using Zuehlke.Eacm.Web.Backend.DomainModel;
 
@@ -25,114 +28,114 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
             this.session = session.ArgumentNotNull(nameof(session));
         }
 
-        public void Handle(CreateProjectCommand message)
+        public async Task Handle(CreateProjectCommand message)
         {
             message.ArgumentNotNull(nameof(message));
 
             var item = new Project(message.Id, message.Name);
-            this.session.Add(item);
+            await this.session.Add(item);
 
-            this.session.Commit();
+			await this.session.Commit();
         }
 
-        public void Handle(ModifyProjectCommand message)
+        public async Task Handle(ModifyProjectCommand message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            var project = await this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.SetProjectAttributes(message.Name, message.Description);
 
-            this.session.Commit();
+			await this.session.Commit();
         }
 
-        public void Handle(CreateEntityCommand message)
+        public async Task Handle(CreateEntityCommand message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            var project = await this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.AddEntityDefinition(message.Name, message.Description);
 
-            this.session.Commit();
+            await this.session.Commit();
         }
 
-        public void Handle(ModifyEntityCommand message)
+        public async Task Handle(ModifyEntityCommand message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            var project = await this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.ModifyEntityDefinition(message.EntityId, message.Name, message.Description);
 
-            this.session.Commit();
+            await this.session.Commit();
         }
 
-        public void Handle(DeleteEntityCommand message)
+        public async Task Handle(DeleteEntityCommand message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            var project = await this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.DeleteEntityDefinition(message.EntityId);
 
-            this.session.Commit();
+            await this.session.Commit();
         }
 
-        public void Handle(CreatePropertyCommand message)
+        public async Task Handle(CreatePropertyCommand message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            var project = await this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.AddPropertyDefinition(message.ParentEntityId, message.Name, message.Description, message.PropertyType);
 
-            this.session.Commit();
+			await this.session.Commit();
         }
 
-        public void Handle(ModifyPropertyCommand message)
+        public async Task Handle(ModifyPropertyCommand message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            var project = await this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.ModifyPropertyDefinition(message.PropertyId, message.Name, message.Description, message.PropertyType);
 
-            this.session.Commit();
+            await this.session.Commit();
         }
 
-        public void Handle(DeletePropertyCommand message)
+        public async Task Handle(DeletePropertyCommand message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            var project = await this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.DeletePropertyDefinition(message.PropertyId);
 
-            this.session.Commit();
+            await this.session.Commit();
         }
 
-        public void Handle(CreateEntryCommand message)
+        public async Task Handle(CreateEntryCommand message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            var project = await this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.AddEntry(message.EntityId, message.Values);
 
-            this.session.Commit();
+			await this.session.Commit();
         }
 
-        public void Handle(ModifyEntryCommand message)
+        public async Task Handle(ModifyEntryCommand message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            var project = await this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.ModifyEntry(message.EntryId, message.Values);
 
-            this.session.Commit();
+            await this.session.Commit();
         }
 
-        public void Handle(DeleteEntryCommand message)
+        public async Task Handle(DeleteEntryCommand message)
         {
             message.ArgumentNotNull(nameof(message));
 
-            var project = this.session.Get<Project>(message.Id, message.ExpectedVersion);
+            var project = await this.session.Get<Project>(message.Id, message.ExpectedVersion);
             project.DeleteEntry(message.EntryId);
 
-            this.session.Commit();
+            await this.session.Commit();
         }
-    }
+	}
 }

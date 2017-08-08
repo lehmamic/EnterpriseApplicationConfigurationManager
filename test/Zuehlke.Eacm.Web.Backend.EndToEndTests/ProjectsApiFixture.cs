@@ -22,7 +22,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void CreateProject_WithValidProjectName_CreatesProject()
+        public async Task CreateProject_WithValidProjectName_CreatesProject()
         {
             // arrange
             var createProjectDto = new CreateProjectCommand
@@ -42,7 +42,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void GetProject_WithValidProjectId_ReturnsProject()
+        public async Task GetProject_WithValidProjectId_ReturnsProject()
         {
             // arrange
             var expectedProject = await this.PrepareProject();
@@ -59,7 +59,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void GetProjects_WithoutQueryOptions_ReturnsProjects()
+        public async Task GetProjects_WithoutQueryOptions_ReturnsProjects()
         {
             // arrange
             var expectedProject1 = await this.PrepareProject();
@@ -77,7 +77,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void UpdateProject_WithValidProjectNameAndDescription_UpdatesProjects()
+        public async Task UpdateProject_WithValidProjectNameAndDescription_UpdatesProjects()
         {
             // arrange
             var existingProject = await this.PrepareProject();
@@ -101,7 +101,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void CreateEntity_WithValidEntityNameAndDescription_CreatesEntity()
+        public async Task CreateEntity_WithValidEntityNameAndDescription_CreatesEntity()
         {
             // arrange
             var existingProject = await this.PrepareProject();
@@ -125,7 +125,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void GetEntity_WithValidProjectAndEntityId_ReturnsEntity()
+        public async Task GetEntity_WithValidProjectAndEntityId_ReturnsEntity()
         {
             // arrange
             var existingProject = await this.PrepareProject();
@@ -143,7 +143,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void GetEntities_WithoutQueryOptions_ReturnsEntities()
+        public async Task GetEntities_WithoutQueryOptions_ReturnsEntities()
         {
             // arrange
             var existingProject = await this.PrepareProject();
@@ -162,7 +162,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void UpdateEntity_WithValidEntityNameAndDescription_UpdatesEntity()
+        public async Task UpdateEntity_WithValidEntityNameAndDescription_UpdatesEntity()
         {
             // arrange
             var existingProject = await this.PrepareProject();
@@ -187,7 +187,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void DeleteEntity_WithValidEntityAndProjectId_RemovesEntity()
+        public async Task DeleteEntity_WithValidEntityAndProjectId_RemovesEntity()
         {
             // arrange
             var existingProject = await this.PrepareProject();
@@ -205,7 +205,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void CreateProperty_WithValidPropertyValues_CreatesProperty()
+        public async Task CreateProperty_WithValidPropertyValues_CreatesProperty()
         {
             // arrange
             var existingProject = await this.PrepareProject();
@@ -232,7 +232,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void GetProperty_WithValidProjecctEntityAndPropertyIds_ReturnsProperty()
+        public async Task GetProperty_WithValidProjecctEntityAndPropertyIds_ReturnsProperty()
         {
             // arrange
             var existingProject = await this.PrepareProject();
@@ -253,7 +253,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void GetProperties_WithoutQueryOptions_ReturnsProperty()
+        public async Task GetProperties_WithoutQueryOptions_ReturnsProperty()
         {
             // arrange
             var existingProject = await this.PrepareProject();
@@ -274,7 +274,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void UpdateProperty_WithValidPropertyValues_UpdatesProperty()
+        public async Task UpdateProperty_WithValidPropertyValues_UpdatesProperty()
         {
             // arrange
             var existingProject = await this.PrepareProject();
@@ -302,7 +302,7 @@ namespace Zuehlke.Eacm.Web.Backend.EndToEndTests
         }
 
         [Fact]
-        public async void DeleteProperty_WithValidIds_RemovesProperty()
+        public async Task DeleteProperty_WithValidIds_RemovesProperty()
         {
             // arrange
             var existingProject = await this.PrepareProject();
