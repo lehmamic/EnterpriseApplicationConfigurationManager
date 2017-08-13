@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-form-panel',
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./form-panel.component.scss']
 })
 export class FormPanelComponent implements OnInit {
+
+  @Input() formGroup: FormGroup;
 
   constructor() { }
 

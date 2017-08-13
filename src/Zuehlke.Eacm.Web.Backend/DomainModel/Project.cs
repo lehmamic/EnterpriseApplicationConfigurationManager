@@ -16,13 +16,13 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel
         {
         }
 
-        public Project(Guid id, string name)
+        public Project(Guid id, string name, string description)
         {
             this.Id = id;
             this.Schema = new ModelDefinition(this.eventAggregator);
             this.Configuration = new Configuration(this.eventAggregator, this.Schema);
 
-            var e = new ProjectCreated { Id = id, Name = name };
+			var e = new ProjectCreated { Id = id, Name = name, Description = description };
             this.ApplyChange(e);
         }
 

@@ -12,5 +12,7 @@ namespace Zuehlke.Eacm.Web.Backend.DomainModel.Events
         public DateTimeOffset TimeStamp { get; set; }
 
         public string Name { get; set; }
+
+		public string Description { get; set; }
     }
 }

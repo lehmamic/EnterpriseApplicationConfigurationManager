@@ -32,7 +32,7 @@ namespace Zuehlke.Eacm.Web.Backend.Commands
         {
             message.ArgumentNotNull(nameof(message));
 
-            var item = new Project(message.Id, message.Name);
+			var item = new Project(message.Id, message.Name, message.Description);
             await this.session.Add(item);
 
 			await this.session.Commit();

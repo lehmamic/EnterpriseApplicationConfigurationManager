@@ -19,7 +19,7 @@ import { ProjectsModule } from './projects/projects.module'
 
 import 'hammerjs';
 import { ProjectsEffects } from './projects/projects.effects';
-import { SharedModule } from './shared';
+import { SharedModule, SharedEffects } from './shared';
 
 @NgModule({
   declarations: [
@@ -35,7 +35,7 @@ import { SharedModule } from './shared';
     RouterModule.forRoot(routes, { useHash: false }),
     StoreRouterConnectingModule,
     !environment.production ? StoreDevtoolsModule.instrument() : [],
-    EffectsModule.forRoot([ProjectsEffects]),
+    EffectsModule.forRoot([ProjectsEffects, SharedEffects]),
     SharedModule,
     ProjectsModule
   ],

@@ -19,6 +19,8 @@ using AutoMapper;
 using Zuehlke.Eacm.Web.Backend.Utils.DependencyInjection;
 using Zuehlke.Eacm.Web.Backend.Utils.Mapper;
 using Zuehlke.Eacm.Web.Backend.Utils.Serialization;
+using CQRSlite.Messages;
+using System;
 
 namespace Zuehlke.Eacm.Web.Backend
 {
@@ -38,7 +40,7 @@ namespace Zuehlke.Eacm.Web.Backend
         public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
 
@@ -64,22 +66,24 @@ namespace Zuehlke.Eacm.Web.Backend
                     .AddClasses(classes => classes.Where(x => {
                         var allInterfaces = x.GetInterfaces();
                         return
-                            allInterfaces.Any(y => y.GetTypeInfo().IsGenericType && y.GetTypeInfo().GetGenericTypeDefinition() == typeof(ICommandHandler<>)) ||
-                            allInterfaces.Any(y => y.GetTypeInfo().IsGenericType && y.GetTypeInfo().GetGenericTypeDefinition() == typeof(IEventHandler<>));
+                            allInterfaces.Any(y => y.GetTypeInfo().IsGenericType && y.GetTypeInfo().GetGenericTypeDefinition() == typeof(IHandler<>)) ||
+                            allInterfaces.Any(y => y.GetTypeInfo().IsGenericType && y.GetTypeInfo().GetGenericTypeDefinition() == typeof(ICancellableHandler<>));
                     }))
                     .AsSelf()
                     .WithTransientLifetime()
             );
+
+			services.AddDbContext<EacmDbContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")));
+
+			// Add framework services.
+			services.AddMvc();
 
             // Register bus
             var serviceProvider = services.BuildServiceProvider();
             var registrar = new BusRegistrar(new DependencyResolver(serviceProvider));
             registrar.Register(typeof(ProjectCommandHandler));
 
-            services.AddDbContext<EacmDbContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")));
-
-            // Add framework services.
-            services.AddMvc();
+			return serviceProvider;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

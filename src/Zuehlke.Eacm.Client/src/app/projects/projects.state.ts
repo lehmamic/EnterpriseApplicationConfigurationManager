@@ -1,11 +1,11 @@
 import { Project } from './projects.service';
 
 export const initialProjectState: ProjectsState = {
-  isLoadingProjects: false,
+  isProcessing: false,
   projects: []
 };
 
 export interface ProjectsState {
-  isLoadingProjects: boolean;
+  isProcessing: boolean;
   projects: Array<Project>
 };

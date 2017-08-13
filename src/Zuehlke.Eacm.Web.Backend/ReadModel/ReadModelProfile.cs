@@ -13,7 +13,6 @@ namespace Zuehlke.Eacm.Web.Backend.ReadModel
         public ReadModelProfile()
         {
             this.CreateMap<ProjectCreated, ConfigurationProject>()
-                .ForMember(p => p.Description, opt => opt.Ignore())
                 .ForMember(p => p.Entities, opt => opt.Ignore());
 
             this.CreateMap<ProjectModified, ConfigurationProject>()

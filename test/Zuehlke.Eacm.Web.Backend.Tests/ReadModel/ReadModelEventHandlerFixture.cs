@@ -30,7 +30,8 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
                 Id = Guid.NewGuid(),
                 Version = 1,
                 TimeStamp = DateTimeOffset.Now,
-                Name = "New Project"
+                Name = "New Project",
+				Description = "A new Project Scription"
             };
 
             var target = new ReadModelEventHandler(this.context.DbContext, this.context.Mapper);
@@ -44,6 +45,7 @@ namespace Zuehlke.Eacm.Web.Backend.Tests.ReadModel
             Assert.Equal(message.Version, project.Version);
             Assert.Equal(message.TimeStamp, project.TimeStamp);
             Assert.Equal(message.Name, project.Name);
+			Assert.Equal(message.Description, project.Description);
             Assert.Null(project.Description);
         }
 

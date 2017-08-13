@@ -16,6 +16,11 @@ export class ProjectsService {
 
   getProjects(): Observable<Array<Project>> {
     return this.http.get('api/projects')
-      .map(res => res.json() || []);;
+      .map(res => res.json() || [])
+  }
+
+  createProject(project: Project): Observable<Project> {
+    return this.http.post('api/projects', project)
+      .map(res => res.json());
   }
 }

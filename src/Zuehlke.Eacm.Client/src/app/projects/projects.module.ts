@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MaterialModule } from '@angular/material';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { SharedModule } from '../shared';
 import { AllProjectsComponent } from './all-projects/all-projects.component';
@@ -12,6 +13,7 @@ import { AddProjectComponent } from './add-project/add-project.component';
 @NgModule({
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     RouterModule,
     MaterialModule,
     SharedModule
