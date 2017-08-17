@@ -4,6 +4,7 @@
     Add project
   </a>
 </app-page-header>
-<p>
-  all-projects works!
-</p>
+<div class="project-card-container">
+  <app-project-tile *ngFor="let project of projects | async" [title]="project.name" [description]="project.description">
+  </app-project-tile>
+</div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Store } from "@ngrx/store";
 
 import { RootState } from "../../app.state";
@@ -11,7 +11,7 @@ import { LoadProjectsAction } from "../projects.actions";
   templateUrl: './all-projects.component.html',
   styleUrls: ['./all-projects.component.scss']
 })
-export class AllProjectsComponent implements OnInit {
+export class AllProjectsComponent {
   projects: Observable<Array<Project>>;
 
   constructor(private store: Store<RootState>) {
@@ -19,8 +19,4 @@ export class AllProjectsComponent implements OnInit {
 
     this.store.dispatch(new LoadProjectsAction());
   }
-
-  ngOnInit() {
-  }
-
 }

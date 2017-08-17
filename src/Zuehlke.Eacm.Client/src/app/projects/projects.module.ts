@@ -8,6 +8,7 @@ import { SharedModule } from '../shared';
 import { AllProjectsComponent } from './all-projects/all-projects.component';
 import { ProjectsService } from "./projects.service";
 import { AddProjectComponent } from './add-project/add-project.component';
+import { ProjectTileComponent } from './project-tile/project-tile.component';
 
 
 @NgModule({
@@ -18,7 +19,7 @@ import { AddProjectComponent } from './add-project/add-project.component';
     MaterialModule,
     SharedModule
   ],
-  declarations: [ AllProjectsComponent, AddProjectComponent ],
+  declarations: [ AllProjectsComponent, AddProjectComponent, ProjectTileComponent ],
   providers: [ ProjectsService ]
 })
 export class ProjectsModule { }

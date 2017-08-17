@@ -1,6 +1,7 @@
 @import "./../app/shared/navbar/_navbar.theme.scss";
 @import "./../app/shared/page-header/_page-header.theme.scss";
 @import "./../app/shared/form-panel/_form-panel.theme.scss";
+@import "./../app/projects/project-tile/_project-tile.theme.scss";
 
 // Styles for the docs app that are based on the current theme.
 @mixin material-app-theme($theme) {
@@ -13,4 +14,5 @@
   @include nav-bar-theme($theme);
   @include page-header-theme($theme);
   @include form-panel-theme($theme);
+  @include project-tile-theme($theme);
 }

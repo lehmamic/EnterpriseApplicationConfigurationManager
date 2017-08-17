@@ -1,0 +1,38 @@
+$project-card-size: 200px;
+
+.project-tile {
+  border-radius: 2px;
+  display: inline-block;
+  height: $project-card-size;
+  width: $project-card-size;
+  margin: 10px;
+  position: relative;
+  vertical-align: top;
+
+  a, a:hover {
+    text-decoration: none;
+  }
+}
+
+.project {
+  height: $project-card-size;
+  width: $project-card-size;
+  text-align: center;
+  display: block;
+}
+
+.project-tile-title {
+  display: block;
+  padding-top: 10px;
+}
+
+.project-tile-content {
+  display: block;
+  margin: 10px;
+  max-height: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+
