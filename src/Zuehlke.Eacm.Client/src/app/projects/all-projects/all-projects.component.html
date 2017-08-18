@@ -1,10 +1,10 @@
 <app-page-header>
   <div class="flex-spacer"></div>
-  <a md-button class="button pageheader-right" routerLink="/new/project" aria-label="Add project">
+  <a md-button class="button pageheader-right" [routerLink]="['/new','project']" aria-label="Add project">
     Add project
   </a>
 </app-page-header>
 <div class="project-card-container">
-  <app-project-tile *ngFor="let project of projects | async" [projectId]="project.id" [title]="project.name" [description]="project.description">
+  <app-project-tile *ngFor="let project of projects | async" [projectId]="['/projects', project.id]" [title]="project.name" [description]="project.description">
   </app-project-tile>
 </div>

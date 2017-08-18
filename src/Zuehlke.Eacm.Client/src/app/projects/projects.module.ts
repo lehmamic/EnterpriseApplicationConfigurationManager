@@ -10,6 +10,8 @@ import { ProjectsService } from "./projects.service";
 import { AddProjectComponent } from './add-project/add-project.component';
 import { ProjectTileComponent } from './project-tile/project-tile.component';
 import { ProjectDetailComponent } from './project-detail/project-detail.component';
+import { ProjectDetailOverviewComponent } from './project-detail-overview/project-detail-overview.component';
+import { ProjectDetailSchemaComponent } from './project-detail-schema/project-detail-schema.component';
 
 
 @NgModule({
@@ -20,7 +22,7 @@ import { ProjectDetailComponent } from './project-detail/project-detail.componen
     MaterialModule,
     SharedModule
   ],
-  declarations: [ AllProjectsComponent, AddProjectComponent, ProjectTileComponent, ProjectDetailComponent ],
+  declarations: [ AllProjectsComponent, AddProjectComponent, ProjectTileComponent, ProjectDetailComponent, ProjectDetailOverviewComponent, ProjectDetailSchemaComponent ],
   providers: [ ProjectsService ]
 })
 export class ProjectsModule { }

@@ -1,3 +1,17 @@
-<p>
-  project works!
-</p>
+<md-sidenav-container class="project-sidenav-container">
+    <md-sidenav class="project-sidenav" [opened]="true" [mode]="'side'">
+      <nav>
+        <ul>
+          <li>
+            <a [routerLink]="['/projects', 'adc', 'overview']" routerLinkActive="project-sidenav-item-selected">Overview</a>
+          </li>
+          <li>
+              <a [routerLink]="['/projects', 'adc', 'schema']" routerLinkActive="project-sidenav-item-selected">Slider</a>
+            </li>
+        </ul>
+      </nav>
+    </md-sidenav>
+    <div class="project-sidenav-content">
+        <router-outlet></router-outlet>
+    </div>
+</md-sidenav-container>
