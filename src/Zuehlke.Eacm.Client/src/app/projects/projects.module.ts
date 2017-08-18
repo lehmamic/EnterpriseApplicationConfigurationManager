@@ -9,6 +9,7 @@ import { AllProjectsComponent } from './all-projects/all-projects.component';
 import { ProjectsService } from "./projects.service";
 import { AddProjectComponent } from './add-project/add-project.component';
 import { ProjectTileComponent } from './project-tile/project-tile.component';
+import { ProjectDetailComponent } from './project-detail/project-detail.component';
 
 
 @NgModule({
@@ -19,7 +20,7 @@ import { ProjectTileComponent } from './project-tile/project-tile.component';
     MaterialModule,
     SharedModule
   ],
-  declarations: [ AllProjectsComponent, AddProjectComponent, ProjectTileComponent ],
+  declarations: [ AllProjectsComponent, AddProjectComponent, ProjectTileComponent, ProjectDetailComponent ],
   providers: [ ProjectsService ]
 })
 export class ProjectsModule { }

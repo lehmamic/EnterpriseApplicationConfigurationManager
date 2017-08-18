@@ -1,5 +1,6 @@
 export * from './add-project';
 export * from './all-projects';
+export * from './project-detail';
 export * from './projects.actions';
 export * from './projects.effects';
 export * from './projects.module';

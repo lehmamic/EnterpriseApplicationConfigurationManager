@@ -5,6 +5,7 @@ import { Observable } from "rxjs/Observable";
 import 'rxjs/add/operator/map';
 
 export interface Project {
+  id: string;
   name: string;
   description: string;
 }
