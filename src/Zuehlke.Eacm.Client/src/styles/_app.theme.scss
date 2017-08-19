@@ -1,7 +1,8 @@
 @import "./../app/shared/navbar/_navbar.theme.scss";
 @import "./../app/shared/page-header/_page-header.theme.scss";
 @import "./../app/shared/form-panel/_form-panel.theme.scss";
-@import "./../app/projects/project-tile/_project-tile.theme.scss";
+@import "./../app/shared/tile/_tile.theme.scss";
+@import "./../app/projects/all-projects/_all-project.theme.scss";
 @import "./../app/projects/project-detail/_project-detail.theme.scss";
 @import "./_general.scss";
 
@@ -16,6 +17,7 @@
   @include nav-bar-theme($theme);
   @include page-header-theme($theme);
   @include form-panel-theme($theme);
-  @include project-tile-theme($theme);
+  @include tile-theme($theme);
+  @include all-project-theme($theme);
   @include project-detail-theme($theme);
 }

@@ -1,0 +1,23 @@
+@import '~@angular/material/theming';
+
+@mixin all-project-theme($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+  $config: mat-typography-config();
+
+  .project-name {
+    color: mat-color($foreground, text);
+    font: {
+      size: mat-font-size($config, headline);
+      weight: mat-font-weight($config, headline);
+    }
+  }
+
+  .project-description {
+    color: map_get($mat-grey, 600);
+    font-size: mat-font-size($config, body-1);
+  }
+}

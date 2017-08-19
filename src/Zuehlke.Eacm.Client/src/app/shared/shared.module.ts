@@ -7,7 +7,8 @@ import { MaterialModule } from '@angular/material';
 import { NavbarComponent } from './navbar';
 import { PageHeaderComponent } from './page-header';
 import { FormActionsComponent } from './form-actions/form-actions.component';
-import { FormPanelComponent, FormPanelHeaderComponent, FormPanelBodyComponent, FormPanelActionsComponent } from './form-panel'
+import { FormPanelComponent, FormPanelHeaderComponent, FormPanelBodyComponent, FormPanelActionsComponent } from './form-panel';
+import { TileComponent } from './tile/tile.component'
 
 @NgModule({
   imports: [
@@ -23,7 +24,8 @@ import { FormPanelComponent, FormPanelHeaderComponent, FormPanelBodyComponent, F
     FormPanelComponent,
     FormPanelHeaderComponent,
     FormPanelBodyComponent,
-    FormPanelActionsComponent
+    FormPanelActionsComponent,
+    TileComponent
   ],
   exports: [
     NavbarComponent,
@@ -32,7 +34,8 @@ import { FormPanelComponent, FormPanelHeaderComponent, FormPanelBodyComponent, F
     FormPanelComponent,
     FormPanelHeaderComponent,
     FormPanelBodyComponent,
-    FormPanelActionsComponent
+    FormPanelActionsComponent,
+    TileComponent
   ],
   providers: [ ]
 })

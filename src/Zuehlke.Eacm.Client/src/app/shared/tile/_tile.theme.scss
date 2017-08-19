@@ -1,6 +1,6 @@
 @import '~@angular/material/theming';
 
-@mixin project-tile-theme($theme) {
+@mixin tile-theme($theme) {
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
   $warn: map-get($theme, warn);
@@ -8,12 +8,12 @@
   $foreground: map-get($theme, foreground);
   $config: mat-typography-config();
 
-  app-project-tile {
+  app-tile {
     color: mat-color($foreground, text);
     background-color: mat-color($background, card);
     font-family: mat-font-family($config);
 
-    .project-tile {
+    .tile-container {
       @include mat-elevation(2);
 
       :hover {
@@ -21,22 +21,23 @@
       }
     }
 
-    .project-tile-title {
-      color: mat-color($foreground, text);
-
-      font: {
-        size: mat-font-size($config, headline);
-        weight: mat-font-weight($config, headline);
-      }
-    }
-
-    .project-tile-content {
-      color: map_get($mat-grey, 600);
-      font-size: mat-font-size($config, body-1);
-    }
-
     :hover {
       background-color: mat-color($background, hover);
     }
   }
+
+
+  // .project-tile-title {
+  //   color: mat-color($foreground, text);
+
+  //   font: {
+  //     size: mat-font-size($config, headline);
+  //     weight: mat-font-weight($config, headline);
+  //   }
+  // }
+
+  // .project-tile-content {
+  //   color: map_get($mat-grey, 600);
+  //   font-size: mat-font-size($config, body-1);
+  // }
 }

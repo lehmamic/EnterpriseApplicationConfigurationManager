@@ -9,3 +9,16 @@
   padding-top: 10px;
 }
 
+.project-name {
+  display: block;
+  padding-top: 10px;
+}
+
+.project-description {
+  display: block;
+  margin: 10px;
+  max-height: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

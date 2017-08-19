@@ -5,6 +5,8 @@
   </a>
 </app-page-header>
 <div class="project-card-container">
-  <app-project-tile *ngFor="let project of projects | async" [projectId]="['/projects', project.id]" [title]="project.name" [description]="project.description">
-  </app-project-tile>
+  <app-tile *ngFor="let project of projects | async" [navigationLink]="['/projects', project.id]">
+    <span class="project-name">{{project.name}}</span>
+    <p class="project-description">{{project.description}}</p>
+  </app-tile>
 </div>

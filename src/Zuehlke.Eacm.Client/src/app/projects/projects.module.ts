@@ -8,7 +8,6 @@ import { SharedModule } from '../shared';
 import { AllProjectsComponent } from './all-projects/all-projects.component';
 import { ProjectsService } from "./projects.service";
 import { AddProjectComponent } from './add-project/add-project.component';
-import { ProjectTileComponent } from './project-tile/project-tile.component';
 import { ProjectDetailComponent } from './project-detail/project-detail.component';
 import { ProjectDetailOverviewComponent } from './project-detail-overview/project-detail-overview.component';
 import { ProjectDetailSchemaComponent } from './project-detail-schema/project-detail-schema.component';
@@ -22,7 +21,7 @@ import { ProjectDetailSchemaComponent } from './project-detail-schema/project-de
     MaterialModule,
     SharedModule
   ],
-  declarations: [ AllProjectsComponent, AddProjectComponent, ProjectTileComponent, ProjectDetailComponent, ProjectDetailOverviewComponent, ProjectDetailSchemaComponent ],
+  declarations: [ AllProjectsComponent, AddProjectComponent, ProjectDetailComponent, ProjectDetailOverviewComponent, ProjectDetailSchemaComponent ],
   providers: [ ProjectsService ]
 })
 export class ProjectsModule { }

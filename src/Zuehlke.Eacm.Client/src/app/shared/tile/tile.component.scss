@@ -1,0 +1,22 @@
+$tile-size: 200px;
+
+.tile-container {
+  border-radius: 2px;
+  display: inline-block;
+  height: $tile-size;
+  width: $tile-size;
+  margin: 10px;
+  position: relative;
+  vertical-align: top;
+
+  a, a:hover {
+    text-decoration: none;
+  }
+}
+
+.tile {
+  height: $tile-size;
+  width: $tile-size;
+  text-align: center;
+  display: block;
+}
