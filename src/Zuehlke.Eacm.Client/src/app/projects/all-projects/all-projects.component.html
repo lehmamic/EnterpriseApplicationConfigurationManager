@@ -1,10 +1,7 @@
-<app-page-header>
-  <div class="flex-spacer"></div>
-  <a md-button class="button pageheader-right" [routerLink]="['/new','project']" aria-label="Add project">
-    Add project
-  </a>
-</app-page-header>
 <div class="project-card-container">
+  <app-tile [navigationLink]="['/new', 'project']">
+      <i class="material-icons md-72 md-dark add-project">add_circle</i>
+  </app-tile>
   <app-tile *ngFor="let project of projects | async" [navigationLink]="['/projects', project.id]">
     <span class="project-name">{{project.name}}</span>
     <p class="project-description">{{project.description}}</p>

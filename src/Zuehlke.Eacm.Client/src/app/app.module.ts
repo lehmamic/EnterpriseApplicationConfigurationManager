@@ -20,12 +20,10 @@ import { ProjectsModule } from './projects/projects.module'
 import 'hammerjs';
 import { ProjectsEffects } from './projects/projects.effects';
 import { SharedModule, SharedEffects } from './shared';
-import { ProjectComponentComponent } from './projets/project-component/project-component.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ProjectComponentComponent,
   ],
   imports: [
     BrowserModule,
