@@ -5,6 +5,7 @@
 @import "./../app/projects/all-projects/_all-project.theme.scss";
 @import "./../app/projects/project-detail/_project-detail.theme.scss";
 @import "./_general.scss";
+@import "./_fonts.scss";
 
 // Styles for the docs app that are based on the current theme.
 @mixin material-app-theme($theme) {
